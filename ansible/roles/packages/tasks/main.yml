@@ -1,0 +1,69 @@
+- name: Check for Homebrew
+  ansible.builtin.stat:
+    path: "{{ brew_bin }}"
+  register: brew_check
+
+- name: Stop if Homebrew is missing
+  ansible.builtin.fail:
+    msg: Homebrew must be installed before running this playbook.
+  when: not brew_check.stat.exists
+
+- name: Gather installed Brew formulae
+  ansible.builtin.command: "{{ brew_bin }} list --formula"
+  register: brew_formulae
+  changed_when: false
+
+- name: Gather installed Brew casks
+  ansible.builtin.command: "{{ brew_bin }} list --cask"
+  register: brew_casks
+  changed_when: false
+
+- name: Gather configured Brew taps
+  ansible.builtin.command: "{{ brew_bin }} tap"
+  register: brew_taps
+  changed_when: false
+
+- name: Tap asmvik/formulae
+  ansible.builtin.command: "{{ brew_bin }} tap asmvik/formulae"
+  when: "'asmvik/formulae' not in brew_taps.stdout_lines"
+
+- name: Tap FelixKratz/formulae
+  ansible.builtin.command: "{{ brew_bin }} tap FelixKratz/formulae"
+  when: "'felixkratz/formulae' not in brew_taps.stdout_lines"
+
+- name: Install Brew formulae
+  ansible.builtin.command: "{{ brew_bin }} install {{ item }}"
+  loop:
+    - ansible
+    - borders
+    - duti
+    - rclone
+    - neovim
+    - sketchybar
+    - skhd
+    - starship
+    - tmux
+    - opencode
+    - yabai
+  when: item not in brew_formulae.stdout_lines
+
+- name: Install Brew casks
+  ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
+  loop:
+    - cleanshot
+    - google-chrome
+    - microsoft-office
+    - microsoft-teams
+    - raycast
+    - slack
+    - zed
+    - ghostty
+    - zoom
+  when: item not in brew_casks.stdout_lines
+
+- name: Install Brew font casks
+  ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
+  loop:
+    - font-jetbrains-mono-nerd-font
+    - font-symbols-only-nerd-font
+  when: item not in brew_casks.stdout_lines

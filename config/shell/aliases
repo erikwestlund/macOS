@@ -1,0 +1,4 @@
+alias ms='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml"'
+alias ms-packages='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags packages'
+alias ms-dotfiles='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags dotfiles'
+alias ms-prefs='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags prefs'

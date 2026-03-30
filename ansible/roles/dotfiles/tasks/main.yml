@@ -1,0 +1,280 @@
+- name: Ensure ~/.config exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/Library/LaunchAgents exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/zed exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/zed"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/ghostty exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/ghostty"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/yabai exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/yabai"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/skhd exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/skhd"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/sketchybar exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/sketchybar"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/borders exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/borders"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/sketchybar/plugins exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/sketchybar/plugins"
+    state: directory
+    mode: "0755"
+
+- name: Link ~/.zshrc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/zsh/zshrc"
+    dest: "{{ ansible_facts.env.HOME }}/.zshrc"
+    state: link
+    force: true
+
+- name: Link ~/.zshrc.d
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/zsh/zshrc.d"
+    dest: "{{ ansible_facts.env.HOME }}/.zshrc.d"
+    state: link
+    force: true
+
+- name: Link ~/.aliases
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/shell/aliases"
+    dest: "{{ ansible_facts.env.HOME }}/.aliases"
+    state: link
+    force: true
+
+- name: Link ~/.tmux.conf
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/tmux/tmux.conf"
+    dest: "{{ ansible_facts.env.HOME }}/.tmux.conf"
+    state: link
+    force: true
+
+- name: Link ~/.config/nvim
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/nvim"
+    dest: "{{ ansible_facts.env.HOME }}/.config/nvim"
+    state: link
+    force: true
+
+- name: Link ~/.config/ghostty/config
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/ghostty/config"
+    dest: "{{ ansible_facts.env.HOME }}/.config/ghostty/config"
+    state: link
+    force: true
+
+- name: Link ~/.config/zed/settings.json
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/zed/settings.json"
+    dest: "{{ ansible_facts.env.HOME }}/.config/zed/settings.json"
+    state: link
+    force: true
+
+- name: Link ~/.config/zed/keymap.json
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/zed/keymap.json"
+    dest: "{{ ansible_facts.env.HOME }}/.config/zed/keymap.json"
+    state: link
+    force: true
+
+- name: Ensure yabairc is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/yabai/yabairc"
+    mode: "0755"
+
+- name: Ensure yabai helper scripts are executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/yabai/{{ item }}"
+    mode: "0755"
+  loop:
+    - open-new-claude.sh
+    - open-new-chatgpt.sh
+    - open-new-youtube.sh
+    - focus-or-launch-app.sh
+    - focus-or-launch-outlook.sh
+    - focus-or-launch-teams.sh
+    - open-new-chrome.sh
+    - focus-active-space.sh
+    - focus-absolute-space.sh
+    - open-new-ghostty.sh
+    - send-window-to-space-and-follow.sh
+    - send-to-scratch-space.sh
+    - toggle-scratch-space.sh
+
+- name: Link ~/.config/yabai/yabairc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/yabai/yabairc"
+    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/yabairc"
+    state: link
+    force: true
+
+- name: Link yabai helper scripts
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/yabai/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - open-new-claude.sh
+    - open-new-chatgpt.sh
+    - open-new-youtube.sh
+    - focus-or-launch-app.sh
+    - focus-or-launch-outlook.sh
+    - focus-or-launch-teams.sh
+    - open-new-chrome.sh
+    - focus-active-space.sh
+    - focus-absolute-space.sh
+    - open-new-ghostty.sh
+    - send-window-to-space-and-follow.sh
+    - send-to-scratch-space.sh
+    - toggle-scratch-space.sh
+
+- name: Ensure skhdrc is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/skhd/skhdrc"
+    mode: "0755"
+
+- name: Link ~/.config/skhd/skhdrc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/skhd/skhdrc"
+    dest: "{{ ansible_facts.env.HOME }}/.config/skhd/skhdrc"
+    state: link
+    force: true
+
+- name: Link ~/.skhdrc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/skhd/skhdrc"
+    dest: "{{ ansible_facts.env.HOME }}/.skhdrc"
+    state: link
+    force: true
+
+- name: Ensure sketchybarrc is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/sketchybar/sketchybarrc"
+    mode: "0755"
+
+- name: Ensure sketchybar plugins are executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/sketchybar/plugins/{{ item }}"
+    mode: "0755"
+  loop:
+    - clock.sh
+    - front_app.sh
+    - space.sh
+
+- name: Link ~/.config/sketchybar/sketchybarrc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/sketchybar/sketchybarrc"
+    dest: "{{ ansible_facts.env.HOME }}/.config/sketchybar/sketchybarrc"
+    state: link
+    force: true
+
+- name: Link SketchyBar plugins
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/sketchybar/plugins/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/sketchybar/plugins/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - clock.sh
+    - front_app.sh
+    - space.sh
+
+- name: Ensure bordersrc is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/borders/bordersrc"
+    mode: "0755"
+
+- name: Link ~/.config/borders/bordersrc
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/borders/bordersrc"
+    dest: "{{ ansible_facts.env.HOME }}/.config/borders/bordersrc"
+    state: link
+    force: true
+
+- name: Ensure keyboard remap script is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/macos/apply-internal-keyboard-remap.sh"
+    mode: "0755"
+
+- name: Ensure web app icon script is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/macos/install-web-app-icon.sh"
+    mode: "0755"
+
+- name: Link keyboard remap LaunchAgent
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/launchd/com.erik.system.internal-keyboard-remap.plist"
+    dest: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.internal-keyboard-remap.plist"
+    state: link
+    force: true
+
+- name: Check keyboard remap LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - print
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.internal-keyboard-remap
+  register: keyboard_remap_agent_status
+  changed_when: false
+  failed_when: false
+
+- name: Load keyboard remap LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - bootstrap
+      - gui/{{ ansible_facts.user_uid }}
+      - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.internal-keyboard-remap.plist"
+  when: keyboard_remap_agent_status.rc != 0
+
+- name: Kickstart keyboard remap LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - kickstart
+      - -k
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.internal-keyboard-remap
+  changed_when: false
+
+- name: Check for Neovim
+  ansible.builtin.stat:
+    path: "{{ nvim_bin }}"
+  register: nvim_check
+
+- name: Bootstrap LazyVim
+  ansible.builtin.command: "{{ nvim_bin }} --headless '+Lazy! sync' +qa"
+  args:
+    creates: "{{ ansible_facts.env.HOME }}/.local/share/nvim/lazy/LazyVim"
+  when: nvim_check.stat.exists

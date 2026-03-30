@@ -1,0 +1,268 @@
+- name: Read natural scrolling preference
+  ansible.builtin.command: defaults read NSGlobalDomain com.apple.swipescrolldirection
+  register: natural_scroll
+  changed_when: false
+  failed_when: false
+
+- name: Apply internal keyboard Caps Lock to Control remap
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/hidutil
+      - property
+      - --matching
+      - '{"Product":"Apple Internal Keyboard / Trackpad","Built-In":true}'
+      - --set
+      - '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":30064771129,"HIDKeyboardModifierMappingDst":30064771328}]}'
+  changed_when: false
+
+- name: Disable natural scrolling
+  ansible.builtin.command: defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+  register: set_natural_scroll
+  when: natural_scroll.stdout != "0"
+
+- name: Restart preference daemons after scroll change
+  ansible.builtin.command: killall {{ item }}
+  loop:
+    - cfprefsd
+    - SystemUIServer
+  when: set_natural_scroll is defined and set_natural_scroll is changed
+
+- name: Read trackpad tap-to-click preference
+  ansible.builtin.command: defaults read com.apple.AppleMultitouchTrackpad Clicking
+  register: trackpad_tap_to_click
+  changed_when: false
+  failed_when: false
+
+- name: Enable trackpad tap-to-click
+  ansible.builtin.command: defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+  register: set_trackpad_tap_to_click
+  when: trackpad_tap_to_click.stdout != "1"
+
+- name: Read current host trackpad tap-to-click preference
+  ansible.builtin.command: defaults -currentHost read NSGlobalDomain com.apple.mouse.tapBehavior
+  register: host_tap_behavior
+  changed_when: false
+  failed_when: false
+
+- name: Enable current host tap-to-click behavior
+  ansible.builtin.command: defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+  register: set_host_tap_behavior
+  when: host_tap_behavior.stdout != "1"
+
+- name: Read global tap-to-click preference
+  ansible.builtin.command: defaults read NSGlobalDomain com.apple.mouse.tapBehavior
+  register: global_tap_behavior
+  changed_when: false
+  failed_when: false
+
+- name: Enable global tap-to-click behavior
+  ansible.builtin.command: defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+  register: set_global_tap_behavior
+  when: global_tap_behavior.stdout != "1"
+
+- name: Restart preference daemons after tap-to-click change
+  ansible.builtin.command: killall {{ item }}
+  loop:
+    - cfprefsd
+    - SystemUIServer
+  when:
+    - (set_trackpad_tap_to_click is defined and set_trackpad_tap_to_click is changed)
+      or (set_host_tap_behavior is defined and set_host_tap_behavior is changed)
+      or (set_global_tap_behavior is defined and set_global_tap_behavior is changed)
+
+- name: Read Dock autohide preference
+  ansible.builtin.command: defaults read com.apple.dock autohide
+  register: dock_autohide
+  changed_when: false
+  failed_when: false
+
+- name: Check for duti
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/duti
+  register: duti_check
+
+- name: Check for managed Chrome web apps
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/Applications/Chrome Apps.localized/{{ item.name }}.app"
+  loop:
+    - { name: "ChatGPT", icon: "chatgpt.png" }
+    - { name: "Claude", icon: "claude.png" }
+    - { name: "YouTube", icon: "youtube.png" }
+  register: web_app_checks
+
+- name: Install managed Chrome web app icons
+  ansible.builtin.command:
+    argv:
+      - "{{ system_repo }}/config/macos/install-web-app-icon.sh"
+      - "{{ item.item.name }}"
+      - "{{ ansible_facts.env.HOME }}/Code/System/Omarchy/local/share/icons/{{ item.item.icon }}"
+  loop: "{{ web_app_checks.results }}"
+  when: item.stat.exists
+  changed_when: false
+
+- name: Set Zed as default editor for common text types
+  ansible.builtin.command: "/opt/homebrew/bin/duti -s dev.zed.Zed {{ item }} all"
+  loop:
+    - public.plain-text
+    - public.text
+    - net.daringfireball.markdown
+    - .txt
+    - .md
+    - .markdown
+    - .log
+    - .json
+    - .yaml
+    - .yml
+    - .csv
+  when: duti_check.stat.exists
+  changed_when: false
+
+- name: Set Google Chrome as default handler for HTML files
+  ansible.builtin.command: "/opt/homebrew/bin/duti -s com.google.Chrome {{ item }} all"
+  loop:
+    - public.html
+    - public.xhtml
+    - .htm
+    - .html
+  when: duti_check.stat.exists
+  changed_when: false
+
+- name: Enable Dock autohide
+  ansible.builtin.command: defaults write com.apple.dock autohide -bool true
+  register: set_dock_autohide
+  when: dock_autohide.stdout != "1"
+
+- name: Read Dock autohide animation speed
+  ansible.builtin.command: defaults read com.apple.dock autohide-time-modifier
+  register: dock_autohide_speed
+  changed_when: false
+  failed_when: false
+
+- name: Set Dock autohide animation speed to zero
+  ansible.builtin.command: defaults write com.apple.dock autohide-time-modifier -float 0
+  register: set_dock_autohide_speed
+  when: dock_autohide_speed.stdout != "0"
+
+- name: Read Dock orientation
+  ansible.builtin.command: defaults read com.apple.dock orientation
+  register: dock_orientation
+  changed_when: false
+  failed_when: false
+
+- name: Read displays-have-separate-spaces preference
+  ansible.builtin.command: defaults read com.apple.spaces spans-displays
+  register: spans_displays
+  changed_when: false
+  failed_when: false
+
+- name: Move Dock to the bottom
+  ansible.builtin.command: defaults write com.apple.dock orientation -string bottom
+  register: set_dock_orientation
+  when: dock_orientation.stdout != "bottom"
+
+- name: Enable displays have separate Spaces
+  ansible.builtin.command: defaults write com.apple.spaces spans-displays -bool false
+  register: set_spans_displays
+  when: spans_displays.stdout != "0"
+
+- name: Restart Dock
+  ansible.builtin.command: killall Dock
+  when:
+    - (set_dock_autohide is defined and set_dock_autohide is changed)
+      or (set_dock_autohide_speed is defined and set_dock_autohide_speed is changed)
+      or (set_dock_orientation is defined and set_dock_orientation is changed)
+      or (set_spans_displays is defined and set_spans_displays is changed)
+
+- name: Check for yabai
+  ansible.builtin.stat:
+    path: "{{ yabai_bin }}"
+  register: yabai_check
+
+- name: Check for skhd
+  ansible.builtin.stat:
+    path: "{{ skhd_bin }}"
+  register: skhd_check
+
+- name: Check for SketchyBar
+  ansible.builtin.stat:
+    path: "{{ sketchybar_bin }}"
+  register: sketchybar_check
+
+- name: Check for borders
+  ansible.builtin.stat:
+    path: "{{ borders_bin }}"
+  register: borders_check
+
+- name: Allow passwordless sudo for current user
+  become: true
+  ansible.builtin.copy:
+    dest: "/private/etc/sudoers.d/{{ ansible_facts.user_id }}"
+    content: "{{ ansible_facts.user_id }} ALL=(ALL) NOPASSWD: ALL\n"
+    owner: root
+    group: wheel
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Read yabai binary sha256
+  ansible.builtin.command: "shasum -a 256 {{ yabai_bin }}"
+  register: yabai_shasum
+  changed_when: false
+  when: yabai_check.stat.exists
+
+- name: Install yabai sudoers rule for scripting addition
+  become: true
+  ansible.builtin.copy:
+    dest: /private/etc/sudoers.d/yabai
+    content: "{{ ansible_facts.user_id }} ALL=(root) NOPASSWD: sha256:{{ yabai_shasum.stdout.split()[0] }} {{ yabai_bin }} --load-sa\n"
+    owner: root
+    group: wheel
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+  when: yabai_check.stat.exists
+
+- name: Start yabai service
+  ansible.builtin.command: "{{ yabai_bin }} --start-service"
+  when: yabai_check.stat.exists
+  changed_when: false
+
+- name: Start skhd service
+  ansible.builtin.command: "{{ skhd_bin }} --start-service"
+  when: skhd_check.stat.exists
+  changed_when: false
+
+- name: Start SketchyBar service
+  ansible.builtin.command: "{{ brew_bin }} services start felixkratz/formulae/sketchybar"
+  when: sketchybar_check.stat.exists
+  changed_when: false
+
+- name: Start borders service
+  ansible.builtin.command: "{{ brew_bin }} services start felixkratz/formulae/borders"
+  when: borders_check.stat.exists
+  changed_when: false
+
+- name: Reload SketchyBar configuration
+  ansible.builtin.command: "{{ sketchybar_bin }} --reload"
+  when: sketchybar_check.stat.exists
+  changed_when: false
+
+- name: Reload borders configuration
+  ansible.builtin.command: "{{ ansible_facts.env.HOME }}/.config/borders/bordersrc"
+  when: borders_check.stat.exists
+  changed_when: false
+
+- name: Load yabai scripting addition
+  become: true
+  ansible.builtin.command: "{{ yabai_bin }} --load-sa"
+  register: yabai_load_sa
+  when: yabai_check.stat.exists
+  changed_when: false
+  failed_when: false
+
+- name: Stop if yabai scripting addition could not be enabled
+  ansible.builtin.fail:
+    msg: >-
+      Failed to load yabai scripting addition. Confirm System Integrity Protection is configured
+      to allow the scripting addition and rerun the playbook. yabai output: {{ yabai_load_sa.stderr | default(yabai_load_sa.stdout, true) | trim }}
+  when:
+    - yabai_check.stat.exists
+    - yabai_load_sa.rc != 0

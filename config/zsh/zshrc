@@ -1,0 +1,3 @@
+. "$HOME/.zshrc.d/path.zsh"
+. "$HOME/.zshrc.d/aliases.zsh"
+. "$HOME/.zshrc.d/prompt.zsh"

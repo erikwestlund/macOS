@@ -1,0 +1,19 @@
+- name: Configure this Mac
+  hosts: localhost
+  gather_facts: true
+  vars:
+    borders_bin: /opt/homebrew/bin/borders
+    system_repo: "{{ playbook_dir | dirname }}"
+    brew_bin: /opt/homebrew/bin/brew
+    nvim_bin: /opt/homebrew/bin/nvim
+    sketchybar_bin: /opt/homebrew/bin/sketchybar
+    skhd_bin: /opt/homebrew/bin/skhd
+    yabai_bin: /opt/homebrew/bin/yabai
+
+  roles:
+    - role: packages
+      tags: [packages]
+    - role: dotfiles
+      tags: [dotfiles]
+    - role: prefs
+      tags: [prefs]
