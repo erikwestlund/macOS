@@ -16,7 +16,7 @@ brew install --cask 1password
 brew install ansible rclone age
 
 # 4. Set up ansible vault password
-printf '%s\n' 'your-vault-password' > ~/.vault_pass
+echo 'your-vault-password' > ~/.vault_pass
 chmod 600 ~/.vault_pass
 
 # 5. Run playbook
