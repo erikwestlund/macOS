@@ -8,7 +8,7 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Command+Shift+M`: open a new `Ghostty` window running `btop`
 - `Command+Shift+F`: open a new Finder window
 - `Command+Shift+E`: focus or launch Fastmail
-- `Command+Shift+/`: focus or launch 1Password
+- `Command+Shift+P`: focus or launch 1Password
 - `Command+Shift+R`: focus or launch Slack
 - `Command+Shift+K`: always open a new `Claude` web app window on the current workspace
 - `Command+Shift+A`: always open a new `ChatGPT` web app window on the current workspace

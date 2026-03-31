@@ -34,7 +34,7 @@ shift + cmd - f : ~/.bin/finder-new-window
 shift + cmd - e : ~/.config/yabai/focus-or-launch-fastmail.sh
 
 # Focus or launch 1Password.
-shift + cmd - 0x2C : ~/.config/yabai/focus-or-launch-1password.sh
+shift + cmd - p : ~/.config/yabai/focus-or-launch-1password.sh
 
 # Focus or launch Slack.
 shift + cmd - r : ~/.bin/focus-or-launch-slack
