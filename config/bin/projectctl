@@ -1,0 +1,341 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+META="$HOME/.bin/project-meta"
+SYSTEM_PROJECTS_DIR="$HOME/System/projects"
+
+cmd="${1:-}"
+id="${2:-}"
+
+project_json() {
+  "$META" json "$1"
+}
+
+project_value() {
+  printf '%s' "$PROJECT_JSON" | /opt/homebrew/bin/jq -r "$1"
+}
+
+ensure_project_loaded() {
+  PROJECT_JSON="$(project_json "$id")"
+  PROJECT_NAME="$(project_value '.name')"
+  PROJECT_ALIAS="$(project_value '.alias')"
+  PROJECT_TYPE="$(project_value '.type')"
+  PROJECT_EDITOR="$(project_value '.editor // "zed"')"
+  PROJECT_DIR="$(project_value '.path')"
+  PROJECT_PM_DIR="$SYSTEM_PROJECTS_DIR/$PROJECT_NAME"
+  PROJECT_VIEW_URL="$(project_value '.extras.view_url // ""')"
+  PROJECT_DOCKER_COMPOSE="$(project_value '.docker_compose // false')"
+  PROJECT_GITHUB_REPO="$(project_value '.github_repo // ""')"
+  PROJECT_REQUIRED_SECRETS="$(project_value '.required_secrets // [] | join("\n")')"
+  PROJECT_OPTIONAL_SECRETS="$(project_value '.optional_secrets // [] | join("\n")')"
+  PROJECT_BOOTSTRAP_COMMANDS="$(project_value '.bootstrap_commands // [] | join("\n")')"
+}
+
+ensure_path_exists() {
+  if [ ! -d "$PROJECT_DIR" ]; then
+    echo "Project path does not exist: $PROJECT_DIR" >&2
+    exit 1
+  fi
+}
+
+deploy_project_secrets() {
+  local src
+  [ -d "$PROJECT_DIR" ] || return 0
+  for src in \
+    "$HOME/.secrets/$PROJECT_NAME" \
+    "$HOME/.secrets/projects-env/$PROJECT_NAME" \
+    "$HOME/.secrets/projects-vault/$PROJECT_NAME" \
+    "$HOME/.secrets/projects-kamal/$PROJECT_NAME"
+  do
+    if [ -d "$src" ]; then
+      /usr/bin/rsync -a --exclude='*.age' "$src/" "$PROJECT_DIR/"
+    fi
+  done
+
+  find "$PROJECT_DIR" -type f -name '*.age' -delete
+}
+
+copy_required_secrets() {
+  local secret src dest
+  [ -d "$PROJECT_DIR" ] || return 0
+  [ -n "$PROJECT_REQUIRED_SECRETS" ] || return 0
+  while IFS= read -r secret; do
+    [ -n "$secret" ] || continue
+    src="$HOME/.secrets/$PROJECT_NAME/$secret"
+    dest="$PROJECT_DIR/$secret"
+    if [ ! -f "$src" ]; then
+      echo "Missing required secret: $src" >&2
+      exit 1
+    fi
+    mkdir -p "$(dirname "$dest")"
+    /bin/cp "$src" "$dest"
+    chmod 600 "$dest"
+  done <<< "$PROJECT_REQUIRED_SECRETS"
+}
+
+copy_optional_secrets() {
+  local secret src dest
+  [ -d "$PROJECT_DIR" ] || return 0
+  [ -n "$PROJECT_OPTIONAL_SECRETS" ] || return 0
+  while IFS= read -r secret; do
+    [ -n "$secret" ] || continue
+    src="$HOME/.secrets/$PROJECT_NAME/$secret"
+    dest="$PROJECT_DIR/$secret"
+    if [ -f "$src" ]; then
+      mkdir -p "$(dirname "$dest")"
+      /bin/cp "$src" "$dest"
+      chmod 600 "$dest"
+    fi
+  done <<< "$PROJECT_OPTIONAL_SECRETS"
+}
+
+ensure_docker_data_dir() {
+  [ -f "$PROJECT_DIR/.env" ] || return 0
+  local docker_data_dir
+  docker_data_dir="$(grep '^DOCKER_DATA_DIR=' "$PROJECT_DIR/.env" | cut -d'=' -f2- || true)"
+  [ -n "$docker_data_dir" ] || return 0
+  if [ ! -d "$docker_data_dir" ]; then
+    mkdir -p "$docker_data_dir"
+  fi
+}
+
+ensure_laravel_runtime_dirs() {
+  mkdir -p \
+    "$PROJECT_DIR/bootstrap/cache" \
+    "$PROJECT_DIR/storage/logs" \
+    "$PROJECT_DIR/storage/framework/cache/data" \
+    "$PROJECT_DIR/storage/framework/sessions" \
+    "$PROJECT_DIR/storage/framework/views"
+}
+
+bootstrap_laravel() {
+  ensure_laravel_runtime_dirs
+  ensure_docker_data_dir
+  if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    (cd "$PROJECT_DIR" && docker compose build)
+  fi
+  if [ -f "$PROJECT_DIR/composer.json" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    (cd "$PROJECT_DIR" && docker compose run --rm php composer install)
+  fi
+  if [ -f "$PROJECT_DIR/package.json" ]; then
+    (cd "$PROJECT_DIR" && npm install)
+  fi
+}
+
+bootstrap_python() {
+  ensure_docker_data_dir
+  if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    (cd "$PROJECT_DIR" && docker compose build)
+  fi
+  if [ -f "$PROJECT_DIR/package.json" ]; then
+    (cd "$PROJECT_DIR" && npm install)
+  fi
+}
+
+bootstrap_rstats() {
+  if [ -f "$PROJECT_DIR/renv.lock" ]; then
+    (cd "$PROJECT_DIR" && Rscript -e 'if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv", repos = "https://cloud.r-project.org"); renv::restore(prompt = FALSE)') || true
+  fi
+  if [ -f "$PROJECT_DIR/package.json" ]; then
+    (cd "$PROJECT_DIR" && npm install)
+  fi
+}
+
+run_bootstrap_commands() {
+  [ -n "$PROJECT_BOOTSTRAP_COMMANDS" ] || return 0
+  while IFS= read -r command; do
+    [ -n "$command" ] || continue
+    (cd "$PROJECT_DIR" && bash -lc "$command")
+  done <<< "$PROJECT_BOOTSTRAP_COMMANDS"
+}
+
+setup_project() {
+  clone_if_needed
+  ensure_path_exists
+  prefer_main_branch
+  mkdir -p "$PROJECT_PM_DIR"
+  deploy_project_secrets
+  copy_required_secrets
+  copy_optional_secrets
+  ensure_docker_data_dir
+
+  if [ "$PROJECT_TYPE" = "laravel" ]; then
+    ensure_laravel_runtime_dirs
+  fi
+
+  if [ "$PROJECT_TYPE" = "python" ]; then
+    if [ -n "$PROJECT_BOOTSTRAP_COMMANDS" ]; then
+      while IFS= read -r command; do
+        [ -n "$command" ] || continue
+        case "$command" in
+          *"docker compose"*|*"docker exec"*) ;;
+          *) (cd "$PROJECT_DIR" && bash -lc "$command") ;;
+        esac
+      done <<< "$PROJECT_BOOTSTRAP_COMMANDS"
+    fi
+  fi
+}
+
+ensure_tmux_session() {
+  if tmux has-session -t "$PROJECT_ALIAS" 2>/dev/null; then
+    return 0
+  fi
+
+  tmux new-session -d -s "$PROJECT_ALIAS" -n bash -c "$PROJECT_DIR"
+  tmux new-window -t "$PROJECT_ALIAS":2 -n opencode-1 -c "$PROJECT_DIR"
+  tmux send-keys -t "$PROJECT_ALIAS":2 "tmux-opencode" C-m
+  tmux new-window -t "$PROJECT_ALIAS":3 -n opencode-2 -c "$PROJECT_DIR"
+  tmux send-keys -t "$PROJECT_ALIAS":3 "tmux-opencode" C-m
+  tmux new-window -t "$PROJECT_ALIAS":4 -n claude-1 -c "$PROJECT_DIR"
+  tmux send-keys -t "$PROJECT_ALIAS":4 "tmux-claude" C-m
+  tmux new-window -t "$PROJECT_ALIAS":5 -n claude-2 -c "$PROJECT_DIR"
+  tmux send-keys -t "$PROJECT_ALIAS":5 "tmux-claude" C-m
+
+  case "$PROJECT_TYPE" in
+    laravel)
+      tmux new-window -t "$PROJECT_ALIAS":6 -n docker -c "$PROJECT_DIR"
+      tmux send-keys -t "$PROJECT_ALIAS":6 "docker compose up" C-m
+      tmux new-window -t "$PROJECT_ALIAS":7 -n npm -c "$PROJECT_DIR"
+      tmux send-keys -t "$PROJECT_ALIAS":7 "[ -f package.json ] && npm run dev" C-m
+      tmux new-window -t "$PROJECT_ALIAS":8 -n artisan -c "$PROJECT_DIR"
+      tmux new-window -t "$PROJECT_ALIAS":9 -n project -c "$PROJECT_DIR"
+      ;;
+    python)
+      tmux new-window -t "$PROJECT_ALIAS":6 -n python -c "$PROJECT_DIR"
+      tmux send-keys -t "$PROJECT_ALIAS":6 "[ -d .venv ] && source .venv/bin/activate; python3" C-m
+      tmux new-window -t "$PROJECT_ALIAS":7 -n project -c "$PROJECT_DIR"
+      ;;
+    rstats)
+      tmux new-window -t "$PROJECT_ALIAS":6 -n R -c "$PROJECT_DIR"
+      tmux send-keys -t "$PROJECT_ALIAS":6 "R" C-m
+      tmux new-window -t "$PROJECT_ALIAS":7 -n python -c "$PROJECT_DIR"
+      tmux send-keys -t "$PROJECT_ALIAS":7 "[ -d .venv ] && source .venv/bin/activate; python3" C-m
+      tmux new-window -t "$PROJECT_ALIAS":8 -n project -c "$PROJECT_DIR"
+      ;;
+    *)
+      tmux new-window -t "$PROJECT_ALIAS":6 -n project -c "$PROJECT_DIR"
+      ;;
+  esac
+
+  tmux select-window -t "$PROJECT_ALIAS":1
+}
+
+clone_if_needed() {
+  if [ -d "$PROJECT_DIR" ]; then
+    return 0
+  fi
+  if [ -z "$PROJECT_GITHUB_REPO" ]; then
+    return 0
+  fi
+  mkdir -p "$(dirname "$PROJECT_DIR")"
+  case "$PROJECT_GITHUB_REPO" in
+    http*|git@*) git clone "$PROJECT_GITHUB_REPO" "$PROJECT_DIR" ;;
+    *) git clone "git@github.com:$PROJECT_GITHUB_REPO.git" "$PROJECT_DIR" ;;
+  esac
+}
+
+prefer_main_branch() {
+  [ -d "$PROJECT_DIR/.git" ] || return 0
+  if git -C "$PROJECT_DIR" ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+    current_branch="$(git -C "$PROJECT_DIR" branch --show-current || true)"
+    if [ "$current_branch" != "main" ]; then
+      if git -C "$PROJECT_DIR" show-ref --verify --quiet refs/heads/main; then
+        git -C "$PROJECT_DIR" checkout main
+      else
+        git -C "$PROJECT_DIR" checkout -b main --track origin/main
+      fi
+    fi
+    git -C "$PROJECT_DIR" branch --set-upstream-to=origin/main main >/dev/null 2>&1 || true
+  fi
+}
+
+case "$cmd" in
+  bootstrap)
+    ensure_project_loaded
+    setup_project
+    case "$PROJECT_TYPE" in
+      laravel) bootstrap_laravel ;;
+      python) bootstrap_python ;;
+      rstats) bootstrap_rstats ;;
+    esac
+    run_bootstrap_commands
+    if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+      true
+    fi
+    ;;
+  setup)
+    ensure_project_loaded
+    setup_project
+    ;;
+  launch)
+    ensure_project_loaded
+    ensure_path_exists
+    mkdir -p "$PROJECT_PM_DIR"
+    deploy_project_secrets
+    if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+      (cd "$PROJECT_DIR" && docker compose up -d)
+    fi
+    ensure_tmux_session
+    ;;
+  kill)
+    ensure_project_loaded
+    if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+      (cd "$PROJECT_DIR" && docker compose down)
+    fi
+    tmux kill-session -t "$PROJECT_ALIAS" 2>/dev/null || true
+    ;;
+  tmux)
+    ensure_project_loaded
+    ensure_path_exists
+    ensure_tmux_session
+    exec tmux attach-session -t "$PROJECT_ALIAS"
+    ;;
+  term)
+    ensure_project_loaded
+    ensure_path_exists
+    /usr/bin/open -na "/Applications/Ghostty.app" --args +new-window --working-directory="$PROJECT_DIR" --command="zsh -lc '$HOME/.bin/projectctl tmux $PROJECT_ALIAS'"
+    ;;
+  zed)
+    ensure_project_loaded
+    ensure_path_exists
+    /usr/bin/open -a "Zed" "$PROJECT_DIR"
+    ;;
+  positron)
+    ensure_project_loaded
+    ensure_path_exists
+    /usr/bin/open -a "Positron" "$PROJECT_DIR"
+    ;;
+  view)
+    ensure_project_loaded
+    [ -n "$PROJECT_VIEW_URL" ] || exit 0
+    /usr/bin/open "$PROJECT_VIEW_URL"
+    ;;
+  up)
+    ensure_project_loaded
+    ensure_path_exists
+    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && docker compose up -d)
+    ;;
+  down)
+    ensure_project_loaded
+    ensure_path_exists
+    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && docker compose down)
+    ;;
+  deploy-secrets)
+    if [ "${id:-}" = "--all" ] || [ -z "${id:-}" ]; then
+      while IFS= read -r alias_name; do
+        [ -n "$alias_name" ] || continue
+        id="$alias_name"
+        ensure_project_loaded
+        deploy_project_secrets
+      done < <("$META" aliases | /usr/bin/grep "alias b" | /usr/bin/sed -E "s/alias b([a-zA-Z0-9_-]+)=.*/\1/")
+    else
+      ensure_project_loaded
+      deploy_project_secrets
+    fi
+    ;;
+  *)
+    echo "usage: projectctl <setup|bootstrap|launch|kill|tmux|term|zed|positron|view|up|down|deploy-secrets> <alias>" >&2
+    exit 1
+    ;;
+esac

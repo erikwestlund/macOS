@@ -24,6 +24,14 @@ ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/pl
 
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are already set up separately and are not bootstrapped through this repository.
+- Secrets sync follows the Omarchy pattern: `~/.secrets` is the local secrets store, `secrets-setup` configures `rclone`, `secrets-pull` syncs secrets locally, and `ms-secrets` deploys them into final locations.
+- Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
+- SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
+- `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
+- NAS credentials are managed via the `nas` role in `/etc/nsmb.conf` so Finder and SMB mounts can authenticate without prompts.
+- Local `.test` development domains are managed via the `localdev` role using `dnsmasq` and `caddy` on macOS through root LaunchDaemons.
+- Launchd jobs archive `~/Screenshots` and move `~/Downloads` entries older than 7 days directly over SSH to `syncthing.lan:/srv/Files/Erik/...`.
+- Syncthing is managed via the `syncthing` role and currently syncs `~/Docs` and `~/Work` to the existing Syncthing server profile from Omarchy.
 - Yabai is installed by Ansible and uses a tracked `config/yabai/yabairc` symlinked to `~/.config/yabai/yabairc`.
 - Borders is installed by Ansible and uses a tracked `config/borders/bordersrc` under `~/.config/borders` for focused window borders.
 - skhd is installed by Ansible and uses a tracked `config/skhd/skhdrc` symlinked to `~/.config/skhd/skhdrc`.

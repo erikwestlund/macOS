@@ -1,0 +1,10 @@
+localdev_dnsmasq_ip: 10.254.254.1
+
+localdev_sites:
+  - domain: academic.test
+    port: 8010
+    wildcard: true
+  - domain: app.academic.test
+    port: 8010
+  - domain: flint.test
+    port: 8031

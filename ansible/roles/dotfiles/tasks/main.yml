@@ -10,6 +10,12 @@
     state: directory
     mode: "0755"
 
+- name: Ensure ~/.bin exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.bin"
+    state: directory
+    mode: "0755"
+
 - name: Ensure ~/.config/zed exists
   ansible.builtin.file:
     path: "{{ ansible_facts.env.HOME }}/.config/zed"
@@ -19,6 +25,24 @@
 - name: Ensure ~/.config/ghostty exists
   ansible.builtin.file:
     path: "{{ ansible_facts.env.HOME }}/.config/ghostty"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.config/git exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/git"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/System/projects exists
+  ansible.builtin.file:
+    path: "{{ system_repo }}/projects"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/Projects exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/Projects"
     state: directory
     mode: "0755"
 
@@ -52,6 +76,12 @@
     state: directory
     mode: "0755"
 
+- name: Ensure ~/.config/macos exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config/macos"
+    state: directory
+    mode: "0755"
+
 - name: Link ~/.zshrc
   ansible.builtin.file:
     src: "{{ system_repo }}/config/zsh/zshrc"
@@ -77,6 +107,20 @@
   ansible.builtin.file:
     src: "{{ system_repo }}/config/tmux/tmux.conf"
     dest: "{{ ansible_facts.env.HOME }}/.tmux.conf"
+    state: link
+    force: true
+
+- name: Link ~/.gitconfig
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/git/gitconfig"
+    dest: "{{ ansible_facts.env.HOME }}/.gitconfig"
+    state: link
+    force: true
+
+- name: Link ~/.gitignore_global
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/git/gitignore_global"
+    dest: "{{ ansible_facts.env.HOME }}/.gitignore_global"
     state: link
     force: true
 
@@ -132,6 +176,20 @@
     - send-to-scratch-space.sh
     - toggle-scratch-space.sh
 
+- name: Ensure secrets helper scripts are executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/bin/{{ item }}"
+    mode: "0755"
+  loop:
+    - pm-new
+    - project-meta
+    - projectctl
+    - secrets-pull
+    - secrets-push
+    - secrets-setup
+    - tmux-claude
+    - tmux-opencode
+
 - name: Link ~/.config/yabai/yabairc
   ansible.builtin.file:
     src: "{{ system_repo }}/config/yabai/yabairc"
@@ -159,6 +217,22 @@
     - send-window-to-space-and-follow.sh
     - send-to-scratch-space.sh
     - toggle-scratch-space.sh
+
+- name: Link secrets helper scripts
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/bin/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/.bin/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - pm-new
+    - project-meta
+    - projectctl
+    - secrets-pull
+    - secrets-push
+    - secrets-setup
+    - tmux-claude
+    - tmux-opencode
 
 - name: Ensure skhdrc is executable
   ansible.builtin.file:
@@ -233,12 +307,40 @@
     path: "{{ system_repo }}/config/macos/install-web-app-icon.sh"
     mode: "0755"
 
+- name: Ensure macOS archive scripts are executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/macos/{{ item }}"
+    mode: "0755"
+  loop:
+    - archive-downloads-to-nas.sh
+    - archive-screenshots-to-nas.sh
+
+- name: Link NAS archive scripts
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/macos/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/macos/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - archive-downloads-to-nas.sh
+    - archive-screenshots-to-nas.sh
+
 - name: Link keyboard remap LaunchAgent
   ansible.builtin.file:
     src: "{{ system_repo }}/config/launchd/com.erik.system.internal-keyboard-remap.plist"
     dest: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.internal-keyboard-remap.plist"
     state: link
     force: true
+
+- name: Link NAS archive LaunchAgents
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/launchd/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - com.erik.system.archive-downloads-to-nas.plist
+    - com.erik.system.archive-screenshots-to-nas.plist
 
 - name: Check keyboard remap LaunchAgent
   ansible.builtin.command:
@@ -247,6 +349,26 @@
       - print
       - gui/{{ ansible_facts.user_uid }}/com.erik.system.internal-keyboard-remap
   register: keyboard_remap_agent_status
+  changed_when: false
+  failed_when: false
+
+- name: Check screenshot archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - print
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.archive-screenshots-to-nas
+  register: screenshot_archive_agent_status
+  changed_when: false
+  failed_when: false
+
+- name: Check downloads archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - print
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.archive-downloads-to-nas
+  register: downloads_archive_agent_status
   changed_when: false
   failed_when: false
 
@@ -259,6 +381,24 @@
       - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.internal-keyboard-remap.plist"
   when: keyboard_remap_agent_status.rc != 0
 
+- name: Load screenshot archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - bootstrap
+      - gui/{{ ansible_facts.user_uid }}
+      - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.archive-screenshots-to-nas.plist"
+  when: screenshot_archive_agent_status.rc != 0
+
+- name: Load downloads archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - bootstrap
+      - gui/{{ ansible_facts.user_uid }}
+      - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.archive-downloads-to-nas.plist"
+  when: downloads_archive_agent_status.rc != 0
+
 - name: Kickstart keyboard remap LaunchAgent
   ansible.builtin.command:
     argv:
@@ -266,6 +406,24 @@
       - kickstart
       - -k
       - gui/{{ ansible_facts.user_uid }}/com.erik.system.internal-keyboard-remap
+  changed_when: false
+
+- name: Kickstart screenshot archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - kickstart
+      - -k
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.archive-screenshots-to-nas
+  changed_when: false
+
+- name: Kickstart downloads archive LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - kickstart
+      - -k
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.archive-downloads-to-nas
   changed_when: false
 
 - name: Check for Neovim

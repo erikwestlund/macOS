@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'json'
+
+config_path = File.expand_path('~/System/config/projects/projects.yml')
+abort('project config not found') unless File.exist?(config_path)
+
+config = YAML.load_file(config_path) || {}
+projects = config['projects'] || []
+
+command = ARGV.shift
+
+find_project = lambda do |id|
+  project = projects.find { |p| p['alias'] == id || p['name'] == id }
+  abort("unknown project: #{id}") unless project
+  project
+end
+
+expand = lambda do |path|
+  return '' if path.nil?
+  File.expand_path(path)
+end
+
+case command
+when 'json'
+  project = find_project.call(ARGV.shift)
+  project = project.dup
+  project['path'] = expand.call(project['path'])
+  root = config['project_manager_root'] || '~/System/projects'
+  project['pm_path'] = File.join(expand.call(root), project['name'])
+  puts JSON.generate(project)
+when 'field'
+  project = find_project.call(ARGV.shift)
+  field = ARGV.shift.to_s
+  value = field.split('.').reduce(project) { |acc, key| acc.is_a?(Hash) ? acc[key] : nil }
+  value = expand.call(value) if field == 'path'
+  puts(value.to_s)
+when 'aliases'
+  root = expand.call(config['project_manager_root'] || '~/System/projects')
+  projects.each do |project|
+    a = project['alias']
+    n = project['name']
+    puts "alias s#{a}='$HOME/.bin/projectctl setup #{a}'"
+    puts "alias b#{a}='$HOME/.bin/projectctl bootstrap #{a}'"
+    puts "alias l#{a}='$HOME/.bin/projectctl launch #{a}'"
+    puts "alias k#{a}='$HOME/.bin/projectctl kill #{a}'"
+    puts "alias tm#{a}='$HOME/.bin/projectctl tmux #{a}'"
+    puts "alias t#{a}='$HOME/.bin/projectctl term #{a}'"
+    puts "alias z#{a}='$HOME/.bin/projectctl zed #{a}'"
+    puts "alias v#{a}='$HOME/.bin/projectctl view #{a}'"
+    puts "alias p#{a}='$HOME/.bin/projectctl positron #{a}'"
+    puts "alias d#{a}='$HOME/.bin/projectctl up #{a}'"
+    puts "alias dd#{a}='$HOME/.bin/projectctl down #{a}'"
+    puts "function #{a}() { cd \"$($HOME/.bin/project-meta field #{a} path)\"; }"
+    puts "function pm#{a}() { mkdir -p \"#{File.join(root, n)}\"; cd \"#{File.join(root, n)}\"; }"
+  end
+else
+  abort('usage: project-meta <json|field|aliases> ...')
+end

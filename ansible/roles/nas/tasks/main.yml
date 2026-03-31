@@ -1,0 +1,46 @@
+- name: Install SMB credentials for NAS
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/nsmb.conf
+    mode: "0600"
+    content: |
+      [default]
+      signing_required=no
+
+      [{{ nas_host }}]
+      username={{ nas_erik_username }}
+      password={{ nas_erik_password }}
+
+      [{{ nas_smb_name }}]
+      username={{ nas_erik_username }}
+      password={{ nas_erik_password }}
+  no_log: true
+
+- name: Install NAS archive environment file
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts.env.HOME }}/.config/macos/nas-archive.env"
+    mode: "0600"
+    content: |
+      NAS_HOST={{ nas_host }}
+      NAS_USER={{ nas_erik_username }}
+      NAS_PASSWORD={{ nas_erik_password }}
+  no_log: true
+
+- name: Remove legacy NAS automount map
+  become: true
+  ansible.builtin.file:
+    path: /etc/auto_nas
+    state: absent
+
+- name: Remove legacy NAS automount entry from /etc/auto_master
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/auto_master
+    regexp: "auto_nas"
+    state: absent
+
+- name: Remove legacy ~/NAS directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/NAS"
+    state: absent
+  failed_when: false

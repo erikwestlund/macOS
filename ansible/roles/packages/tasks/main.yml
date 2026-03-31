@@ -34,16 +34,45 @@
 - name: Install Brew formulae
   ansible.builtin.command: "{{ brew_bin }} install {{ item }}"
   loop:
+    - age
     - ansible
     - borders
+    - composer
+    - caddy
+    - dnsmasq
     - duti
+    - ffmpeg
+    - gh
+    - ghostscript
+    - git-lfs
+    - imagemagick
+    - jq
+    - libpq
+    - mysql-client
+    - openjdk
+    - pandoc
+    - php
+    - pipx
+    - playwright-cli
+    - pngquant
+    - poppler
+    - qpdf
+    - r
     - rclone
     - neovim
+    - redis
     - sketchybar
     - skhd
     - starship
+    - syncthing
     - tmux
+    - unpaper
+    - zsh-autosuggestions
+    - zsh-completions
+    - zsh-fast-syntax-highlighting
     - opencode
+    - uv
+    - wget
     - yabai
   when: item not in brew_formulae.stdout_lines
 
@@ -54,8 +83,15 @@
     - google-chrome
     - microsoft-office
     - microsoft-teams
+    - morgen
+    - orbstack
+    - positron
     - raycast
+    - rstudio
     - slack
+    - spotify
+    - t3-code
+    - tableplus
     - zed
     - ghostty
     - zoom

@@ -20,6 +20,9 @@ spaces=13
 /opt/homebrew/bin/yabai -m rule --add app="^System Settings$" manage=off
 /opt/homebrew/bin/yabai -m rule --add app="^1Password$" manage=off
 /opt/homebrew/bin/yabai -m rule --add app="^Messages$" manage=off
+/opt/homebrew/bin/yabai -m rule --add app="^Finder$" manage=off
+/opt/homebrew/bin/yabai -m rule --add app="^zoom\.us$" manage=off
+/opt/homebrew/bin/yabai -m rule --add title=".*(Settings|Preferences|Configuration|Config).*" manage=off
 
 # Ensure a stable set of spaces exists on the primary display.
 current_spaces=$(/opt/homebrew/bin/yabai -m query --spaces --display 1 | /usr/bin/grep -c '"id"')

@@ -1,0 +1,135 @@
+- name: Ensure localdev helper script is executable
+  ansible.builtin.file:
+    path: "{{ system_repo }}/config/macos/ensure-localdev-loopback.sh"
+    mode: "0755"
+
+- name: Install localdev loopback script
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/macos/ensure-localdev-loopback.sh"
+    dest: /usr/local/bin/ensure-localdev-loopback.sh
+    remote_src: true
+    mode: "0755"
+
+- name: Install loopback alias LaunchDaemon
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/launchd/com.erik.system.localdev-loopback.plist"
+    dest: /Library/LaunchDaemons/com.erik.system.localdev-loopback.plist
+    remote_src: true
+    mode: "0644"
+
+- name: Ensure loopback alias is active now
+  become: true
+  ansible.builtin.command: /usr/local/bin/ensure-localdev-loopback.sh
+  changed_when: false
+
+- name: Bootstrap localdev loopback LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl bootstrap system /Library/LaunchDaemons/com.erik.system.localdev-loopback.plist
+  register: localdev_loopback_bootstrap
+  failed_when: false
+  changed_when: localdev_loopback_bootstrap.rc == 0
+
+- name: Kickstart localdev loopback LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl kickstart -k system/com.erik.system.localdev-loopback
+  changed_when: false
+
+- name: Ensure dnsmasq config directory exists
+  become: true
+  ansible.builtin.file:
+    path: /opt/homebrew/etc/dnsmasq.d
+    state: directory
+    mode: "0755"
+
+- name: Install dnsmasq localdev config
+  become: true
+  ansible.builtin.copy:
+    dest: /opt/homebrew/etc/dnsmasq.d/localdev.conf
+    mode: "0644"
+    content: |
+      listen-address={{ localdev_dnsmasq_ip }}
+      bind-interfaces
+      port=53
+      no-resolv
+      no-poll
+      address=/.test/127.0.0.1
+
+- name: Ensure /etc/resolver exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/resolver
+    state: directory
+    mode: "0755"
+
+- name: Install resolver for .test domains
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/resolver/test
+    mode: "0644"
+    content: |
+      nameserver {{ localdev_dnsmasq_ip }}
+      port 53
+
+- name: Install Caddyfile for localdev domains
+  become: true
+  ansible.builtin.copy:
+    dest: /opt/homebrew/etc/Caddyfile
+    mode: "0644"
+    content: |
+      {
+        auto_https off
+        admin off
+      }
+
+      {% for site in localdev_sites %}
+      {% set domains = ['http://' ~ site.domain] %}
+      {% if site.wildcard | default(false) %}
+      {% set _ = domains.append('http://*.' ~ site.domain) %}
+      {% endif %}
+      {{ domains | join(', ') }} {
+        reverse_proxy 127.0.0.1:{{ site.port }}
+      }
+
+      {% endfor %}
+
+- name: Install dnsmasq LaunchDaemon
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/launchd/com.erik.system.dnsmasq.plist"
+    dest: /Library/LaunchDaemons/com.erik.system.dnsmasq.plist
+    remote_src: true
+    mode: "0644"
+
+- name: Install caddy LaunchDaemon
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/launchd/com.erik.system.caddy.plist"
+    dest: /Library/LaunchDaemons/com.erik.system.caddy.plist
+    remote_src: true
+    mode: "0644"
+
+- name: Bootstrap dnsmasq LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl bootstrap system /Library/LaunchDaemons/com.erik.system.dnsmasq.plist
+  register: dnsmasq_bootstrap
+  failed_when: false
+  changed_when: dnsmasq_bootstrap.rc == 0
+
+- name: Bootstrap caddy LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl bootstrap system /Library/LaunchDaemons/com.erik.system.caddy.plist
+  register: caddy_bootstrap
+  failed_when: false
+  changed_when: caddy_bootstrap.rc == 0
+
+- name: Kickstart dnsmasq LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl kickstart -k system/com.erik.system.dnsmasq
+  changed_when: false
+
+- name: Kickstart caddy LaunchDaemon
+  become: true
+  ansible.builtin.command: launchctl kickstart -k system/com.erik.system.caddy
+  changed_when: false

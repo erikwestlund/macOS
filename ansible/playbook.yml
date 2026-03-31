@@ -1,6 +1,8 @@
 - name: Configure this Mac
   hosts: localhost
   gather_facts: true
+  vars_files:
+    - vault/secrets.yml
   vars:
     borders_bin: /opt/homebrew/bin/borders
     system_repo: "{{ playbook_dir | dirname }}"
@@ -15,5 +17,13 @@
       tags: [packages]
     - role: dotfiles
       tags: [dotfiles]
+    - role: secrets
+      tags: [secrets]
+    - role: localdev
+      tags: [localdev, dns, caddy]
+    - role: nas
+      tags: [nas]
+    - role: syncthing
+      tags: [syncthing]
     - role: prefs
       tags: [prefs]

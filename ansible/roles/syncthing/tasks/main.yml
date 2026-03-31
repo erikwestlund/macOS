@@ -1,0 +1,134 @@
+- name: Check for Syncthing
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/syncthing
+  register: syncthing_check
+
+- name: Start Syncthing service
+  ansible.builtin.command: /opt/homebrew/bin/brew services start syncthing
+  when: syncthing_check.stat.exists
+  changed_when: false
+
+- name: Wait for Syncthing to be ready
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli show system
+  register: syncthing_status
+  until: syncthing_status.rc == 0
+  retries: 15
+  delay: 2
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Allow local.syncthing.lan hostname in GUI
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli config gui insecure-skip-host-check set true
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Disable Syncthing GUI TLS behind local proxy
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli config gui raw-use-tls set false
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Check Syncthing devices
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli config devices list
+  register: syncthing_devices
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Add Syncthing server device
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config devices add
+    --device-id {{ syncthing_server_device_id }}
+    --name "Syncthing Server"
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_server_device_id not in syncthing_devices.stdout
+
+- name: Read Syncthing server device config
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli config devices {{ syncthing_server_device_id }} dump-json
+  register: server_device_config
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Add Syncthing LAN address
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config devices {{ syncthing_server_device_id }} addresses add "{{ syncthing_server_lan_address }}"
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_server_lan_address not in server_device_config.stdout
+
+- name: Add Syncthing DDNS address
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config devices {{ syncthing_server_device_id }} addresses add "{{ syncthing_server_ddns_address }}"
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_server_ddns_address not in server_device_config.stdout
+
+- name: Ensure Syncthing directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ syncthing_docs_path }}"
+    - "{{ syncthing_work_path }}"
+  when: syncthing_check.stat.exists
+
+- name: Ensure .stfolder markers exist
+  ansible.builtin.file:
+    path: "{{ item }}/.stfolder"
+    state: touch
+    mode: "0644"
+  loop:
+    - "{{ syncthing_docs_path }}"
+    - "{{ syncthing_work_path }}"
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Check Syncthing folders
+  ansible.builtin.command: /opt/homebrew/bin/syncthing cli config folders list
+  register: syncthing_folders
+  changed_when: false
+  when: syncthing_check.stat.exists
+
+- name: Add Docs folder
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config folders add
+    --id "{{ syncthing_docs_folder_id }}"
+    --label "Docs"
+    --path "{{ syncthing_docs_path }}"
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_docs_folder_id not in syncthing_folders.stdout
+
+- name: Associate Docs with Syncthing server
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config folders {{ syncthing_docs_folder_id }} devices add
+    --device-id {{ syncthing_server_device_id }}
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_docs_folder_id not in syncthing_folders.stdout
+
+- name: Add Work folder
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config folders add
+    --id "{{ syncthing_work_folder_id }}"
+    --label "Work"
+    --path "{{ syncthing_work_path }}"
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_work_folder_id not in syncthing_folders.stdout
+
+- name: Associate Work with Syncthing server
+  ansible.builtin.command: >
+    /opt/homebrew/bin/syncthing cli config folders {{ syncthing_work_folder_id }} devices add
+    --device-id {{ syncthing_server_device_id }}
+  when:
+    - syncthing_check.stat.exists
+    - syncthing_work_folder_id not in syncthing_folders.stdout
+
+- name: Create Work .stignore
+  ansible.builtin.copy:
+    dest: "{{ syncthing_work_path }}/.stignore"
+    content: "OneDrive\n"
+    mode: "0644"
+    force: false
+  when: syncthing_check.stat.exists

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG="$HOME/System/config/projects/projects.yml"
+PM_ROOT="$HOME/System/projects"
+PROJECT_ROOT="$HOME/Projects"
+
+to_kebab() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//'
+}
+
+echo "=== New Project Setup ==="
+read -r -p "Project name: " display_name
+[ -n "$display_name" ] || { echo "Project name is required"; exit 1; }
+
+kebab_name="$(to_kebab "$display_name")"
+read -r -p "Project dir name [$kebab_name]: " project_name
+project_name="${project_name:-$kebab_name}"
+
+read -r -p "Alias: " project_alias
+[ -n "$project_alias" ] || { echo "Alias is required"; exit 1; }
+
+echo "Type: 1) utility 2) laravel 3) python 4) rstats"
+read -r -p "Choice [1-4, default=1]: " type_choice
+case "$type_choice" in
+  2) project_type="laravel" ;;
+  3) project_type="python" ;;
+  4) project_type="rstats" ;;
+  *) project_type="utility" ;;
+esac
+
+echo "Editor: 1) zed 2) positron 3) neovim"
+read -r -p "Choice [1-3, default=1]: " editor_choice
+case "$editor_choice" in
+  2) project_editor="positron" ;;
+  3) project_editor="neovim" ;;
+  *) project_editor="zed" ;;
+esac
+
+read -r -p "Use Docker Compose? [y/N]: " use_docker
+if [[ "$use_docker" =~ ^[Yy]$ ]]; then
+  docker_compose=true
+else
+  docker_compose=false
+fi
+
+read -r -p "Project path [~/Projects/$project_name]: " project_path
+project_path="${project_path:-$PROJECT_ROOT/$project_name}"
+
+read -r -p "GitHub repo (user/repo or URL, optional): " github_repo
+read -r -p "View URL (optional): " view_url
+
+ruby <<RUBY
+require 'yaml'
+config_path = File.expand_path('$CONFIG')
+data = File.exist?(config_path) ? YAML.load_file(config_path) : {}
+data['project_root'] ||= '~/Projects'
+data['project_manager_root'] ||= '~/System/projects'
+data['projects'] ||= []
+if data['projects'].any? { |p| p['alias'] == '$project_alias' || p['name'] == '$project_name' }
+  abort('Project alias or name already exists')
+end
+project = {
+  'name' => '$project_name',
+  'alias' => '$project_alias',
+  'type' => '$project_type',
+  'editor' => '$project_editor',
+  'docker_compose' => #{docker_compose},
+  'path' => '$project_path'
+}
+project['github_repo'] = '$github_repo' unless '$github_repo'.empty?
+unless '$view_url'.empty?
+  project['extras'] = { 'view_url' => '$view_url' }
+end
+data['projects'] << project
+File.write(config_path, data.to_yaml(line_width: -1))
+RUBY
+
+mkdir -p "$PM_ROOT/$project_name"
+
+echo "Created project '$project_name'."
+echo "Reload shell with: exec zsh"
+echo "New commands: s$project_alias b$project_alias l$project_alias k$project_alias tm$project_alias t$project_alias z$project_alias v$project_alias"

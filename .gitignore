@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+.cache/
+
+# Environment and secrets
+.env
+.env.*
+.vault_pass
+ansible/vault/secrets.yml
+
+# Ansible retries
+*.retry
+
+# Local AI tooling state
+.claude/

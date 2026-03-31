@@ -1,0 +1,22 @@
+syncthing_server_device_id: "6Y6GSBL-C5MTNSQ-P2PDN32-4B6UKWU-TAW6WXB-QPJQHZ3-RJGJHXY-HPWKEQL"
+syncthing_server_lan_address: "tcp://syncthing.lan:22000"
+syncthing_server_ddns_address: "tcp://erikwestlund.ddns.net:22000"
+
+syncthing_docs_folder_id: "erik-documents"
+syncthing_work_folder_id: "erik-work"
+
+syncthing_docs_path: "{{ ansible_facts.env.HOME }}/Docs"
+syncthing_work_path: "{{ ansible_facts.env.HOME }}/Work"
+
+nas_erik_username: "{{ vault_nas_erik_username }}"
+nas_erik_password: "{{ vault_nas_erik_password }}"
+nas_host: "nas.lan"
+nas_smb_name: "Pequod-NAS"
+nas_mount_root: "/Volumes"
+nas_shares:
+  - ISOs
+  - Media
+  - Photos
+  - Research
+  - UnifiDrive
+  - WorkArtifacts
