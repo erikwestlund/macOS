@@ -13,18 +13,36 @@ git clone https://github.com/erikwestlund/system ~/System
 
 # 3. Install core tools
 brew install --cask 1password
-brew install ansible rclone
+brew install ansible rclone age
 
-# 4. Run playbook
+# 4. Set up ansible vault password
+printf '%s\n' 'your-vault-password' > ~/.vault_pass
+chmod 600 ~/.vault_pass
+
+# 5. Run playbook
 # -K prompts for sudo password
 ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/playbook.yml -K
+```
+
+The first playbook run is also the secrets bootstrap. It reads `ansible/vault/secrets.yml`, writes `~/.config/secrets/config`, and runs `secrets-pull` so `~/.secrets` is populated before secrets-backed roles are applied.
+
+## Secrets
+
+Secrets are required for a working setup on a new machine.
+
+```bash
+# Re-sync encrypted secrets into ~/.secrets/
+secrets-pull
+
+# Re-deploy secrets-backed files into their final locations
+ms-secrets
 ```
 
 ## Notes
 
 - Dotfiles and system configuration live in `~/System`.
-- Secrets are already set up separately and are not bootstrapped through this repository.
-- Secrets sync follows the Omarchy pattern: `~/.secrets` is the local secrets store, `secrets-setup` configures `rclone`, `secrets-pull` syncs secrets locally, and `ms-secrets` deploys them into final locations.
+- Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `ms-secrets` deploys them into final locations.
+- macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
 - `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
