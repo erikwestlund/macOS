@@ -219,6 +219,7 @@
     - open-new-chatgpt.sh
     - open-new-youtube.sh
     - focus-or-launch-app.sh
+    - focus-or-launch-1password.sh
     - focus-or-launch-fastmail.sh
     - focus-or-launch-outlook.sh
     - focus-or-launch-teams.sh
@@ -246,6 +247,7 @@
     - open-new-chatgpt.sh
     - open-new-youtube.sh
     - focus-or-launch-app.sh
+    - focus-or-launch-1password.sh
     - focus-or-launch-fastmail.sh
     - focus-or-launch-outlook.sh
     - focus-or-launch-teams.sh

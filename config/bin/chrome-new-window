@@ -3,23 +3,66 @@
 set -euo pipefail
 
 url="${1:-}"
+chrome_running=$(
+  /usr/bin/osascript <<'EOF'
+tell application "System Events"
+  return exists process "Google Chrome"
+end tell
+EOF
+)
 
-if [[ -n "$url" ]]; then
-  osascript - "$url" <<'EOF'
+if [[ "$chrome_running" == "true" ]]; then
+  if [[ -n "$url" ]]; then
+    /usr/bin/osascript - "$url" <<'EOF'
 on run argv
   set targetUrl to item 1 of argv
   tell application "Google Chrome"
     activate
-    make new window
-    set URL of active tab of front window to targetUrl
+    set newWindow to make new window
+    set URL of active tab of newWindow to targetUrl
   end tell
 end run
 EOF
-else
-  osascript <<'EOF'
+  else
+    /usr/bin/osascript <<'EOF'
 tell application "Google Chrome"
   activate
   make new window
 end tell
 EOF
+  fi
+else
+  /usr/bin/open -a "Google Chrome"
+
+  for _ in {1..40}; do
+    chrome_ready=$(
+      /usr/bin/osascript <<'EOF'
+tell application "Google Chrome"
+  return (count of windows) > 0
+end tell
+EOF
+    )
+
+    if [[ "$chrome_ready" == "true" ]]; then
+      break
+    fi
+
+    /bin/sleep 0.1
+  done
+
+  if [[ -n "$url" ]]; then
+    /usr/bin/osascript - "$url" <<'EOF'
+on run argv
+  set targetUrl to item 1 of argv
+  tell application "Google Chrome"
+    activate
+    set URL of active tab of front window to targetUrl
+  end tell
+end run
+EOF
+  else
+    /usr/bin/osascript <<'EOF'
+tell application "Google Chrome" to activate
+EOF
+  fi
 fi
