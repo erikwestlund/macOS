@@ -8,11 +8,16 @@ if [[ -n "$cmd" ]]; then
   osascript - "$cmd" <<'EOF'
 on run argv
   set cmd to item 1 of argv
+  set wasRunning to application "Ghostty" is running
   tell application "Ghostty" to activate
-  delay 0.15
-  tell application "System Events"
-    keystroke "n" using command down
+  delay 0.2
+  if wasRunning then
+    tell application "System Events"
+      keystroke "n" using command down
+    end tell
     delay 0.15
+  end if
+  tell application "System Events"
     keystroke cmd
     key code 36
   end tell
@@ -20,10 +25,13 @@ end run
 EOF
 else
   osascript <<'EOF'
+set wasRunning to application "Ghostty" is running
 tell application "Ghostty" to activate
-delay 0.15
-tell application "System Events"
-  keystroke "n" using command down
-end tell
+delay 0.2
+if wasRunning then
+  tell application "System Events"
+    keystroke "n" using command down
+  end tell
+end if
 EOF
 fi
