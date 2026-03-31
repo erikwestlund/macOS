@@ -8,3 +8,11 @@ localdev_sites:
     port: 8010
   - domain: flint.test
     port: 8031
+  - domain: better-shoes.test
+    port: 8020
+  - domain: framework-site.test
+    port: 8032
+  - domain: wordlegroup.test
+    port: 8033
+  - domain: naaccord.test
+    port: 8040

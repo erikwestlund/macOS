@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-/usr/bin/open -na "/Applications/Ghostty.app"
+"$HOME/.bin/ghostty-new-window"

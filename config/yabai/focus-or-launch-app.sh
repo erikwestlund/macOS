@@ -10,6 +10,7 @@ window_json=$(/opt/homebrew/bin/yabai -m query --windows | /usr/bin/jq -c --arg 
 
 if [ "$window_json" = "null" ] || [ -z "$window_json" ]; then
   /usr/bin/open -a "$app_path"
+  /bin/sleep 0.15
   exit 0
 fi
 
@@ -20,6 +21,6 @@ window_id=$(printf '%s' "$window_json" | /usr/bin/jq -r '.id')
 [ -n "$window_id" ] || exit 1
 
 /opt/homebrew/bin/yabai -m space --focus "$target_space" || exit 1
-/usr/bin/open -a "$app_path"
+/usr/bin/open -a "$app_path" || true
 /bin/sleep 0.05
 /opt/homebrew/bin/yabai -m window --focus "$window_id"

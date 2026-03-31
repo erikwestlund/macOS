@@ -166,6 +166,8 @@
     - open-new-chatgpt.sh
     - open-new-youtube.sh
     - focus-or-launch-app.sh
+    - focus-or-launch-1password.sh
+    - focus-or-launch-fastmail.sh
     - focus-or-launch-outlook.sh
     - focus-or-launch-teams.sh
     - open-new-chrome.sh
@@ -181,6 +183,18 @@
     path: "{{ system_repo }}/config/bin/{{ item }}"
     mode: "0755"
   loop:
+    - add-task
+    - artifacts-pull
+    - artifacts-push
+    - chrome-new-window
+    - finder-new-window
+    - focus-or-launch-slack
+    - ghostty-cheatsheet
+    - ghostty-btop
+    - ghostty-new-window
+    - ghcr-login
+    - open-fastmail
+    - na-arm64-images
     - pm-new
     - project-meta
     - projectctl
@@ -189,25 +203,50 @@
     - secrets-setup
     - tmux-claude
     - tmux-opencode
+    - vault-view
 
-- name: Link ~/.config/yabai/yabairc
+- name: Remove existing ~/.config/yabai/yabairc before copy
   ansible.builtin.file:
-    src: "{{ system_repo }}/config/yabai/yabairc"
-    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/yabairc"
-    state: link
-    force: true
+    path: "{{ ansible_facts.env.HOME }}/.config/yabai/yabairc"
+    state: absent
 
-- name: Link yabai helper scripts
+- name: Remove existing yabai helper scripts before copy
   ansible.builtin.file:
-    src: "{{ system_repo }}/config/yabai/{{ item }}"
-    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
-    state: link
-    force: true
+    path: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
+    state: absent
   loop:
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
     - focus-or-launch-app.sh
+    - focus-or-launch-fastmail.sh
+    - focus-or-launch-outlook.sh
+    - focus-or-launch-teams.sh
+    - open-new-chrome.sh
+    - focus-active-space.sh
+    - focus-absolute-space.sh
+    - open-new-ghostty.sh
+    - send-window-to-space-and-follow.sh
+    - send-to-scratch-space.sh
+    - toggle-scratch-space.sh
+
+- name: Copy ~/.config/yabai/yabairc
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/yabai/yabairc"
+    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/yabairc"
+    mode: "0755"
+
+- name: Copy yabai helper scripts
+  ansible.builtin.copy:
+    src: "{{ system_repo }}/config/yabai/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
+    mode: "0755"
+  loop:
+    - open-new-claude.sh
+    - open-new-chatgpt.sh
+    - open-new-youtube.sh
+    - focus-or-launch-app.sh
+    - focus-or-launch-fastmail.sh
     - focus-or-launch-outlook.sh
     - focus-or-launch-teams.sh
     - open-new-chrome.sh
@@ -225,6 +264,18 @@
     state: link
     force: true
   loop:
+    - add-task
+    - artifacts-pull
+    - artifacts-push
+    - chrome-new-window
+    - finder-new-window
+    - focus-or-launch-slack
+    - ghostty-cheatsheet
+    - ghostty-btop
+    - ghostty-new-window
+    - ghcr-login
+    - open-fastmail
+    - na-arm64-images
     - pm-new
     - project-meta
     - projectctl
@@ -233,6 +284,7 @@
     - secrets-setup
     - tmux-claude
     - tmux-opencode
+    - vault-view
 
 - name: Ensure skhdrc is executable
   ansible.builtin.file:

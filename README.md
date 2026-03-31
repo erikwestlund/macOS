@@ -32,7 +32,7 @@ ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/pl
 - Local `.test` development domains are managed via the `localdev` role using `dnsmasq` and `caddy` on macOS through root LaunchDaemons.
 - Launchd jobs archive `~/Screenshots` and move `~/Downloads` entries older than 7 days directly over SSH to `syncthing.lan:/srv/Files/Erik/...`.
 - Syncthing is managed via the `syncthing` role and currently syncs `~/Docs` and `~/Work` to the existing Syncthing server profile from Omarchy.
-- Yabai is installed by Ansible and uses a tracked `config/yabai/yabairc` symlinked to `~/.config/yabai/yabairc`.
+- Yabai is installed by Ansible and copies tracked files from `config/yabai` into `~/.config/yabai`.
 - Borders is installed by Ansible and uses a tracked `config/borders/bordersrc` under `~/.config/borders` for focused window borders.
 - skhd is installed by Ansible and uses a tracked `config/skhd/skhdrc` symlinked to `~/.config/skhd/skhdrc`.
 - SketchyBar is installed by Ansible and uses a tracked `config/sketchybar` under `~/.config/sketchybar`.

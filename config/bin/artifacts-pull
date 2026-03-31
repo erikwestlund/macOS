@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECTS_DIR="$HOME/Projects"
+REMOTE_HOST="syncthing.lan"
+REMOTE_ROOT="/srv/Files/Erik/WorkArtifacts"
+META="$HOME/.bin/project-meta"
+
+resolve_project_name() {
+  local id="$1"
+  if [[ -x "$META" ]]; then
+    "$META" field "$id" name 2>/dev/null || printf '%s' "$id"
+  else
+    printf '%s' "$id"
+  fi
+}
+
+resolve_project_dir() {
+  local id="$1"
+  if [[ -x "$META" ]]; then
+    "$META" field "$id" path 2>/dev/null || printf '%s/%s' "$PROJECTS_DIR" "$id"
+  else
+    printf '%s/%s' "$PROJECTS_DIR" "$id"
+  fi
+}
+
+pull_project() {
+  local id="$1"
+  local project_name project_dir remote_dir
+
+  project_name="$(resolve_project_name "$id")"
+  project_dir="$(resolve_project_dir "$id")"
+  remote_dir="$REMOTE_ROOT/$project_name"
+
+  if [[ ! -d "$project_dir" ]]; then
+    echo "Warning: Local project directory not found: $project_dir (skipping)"
+    return 0
+  fi
+
+  if ! ssh "$REMOTE_HOST" "test -d '$remote_dir'" >/dev/null 2>&1; then
+    echo "Warning: No artifacts on remote for: $project_name (skipping)"
+    return 0
+  fi
+
+  echo "=== $project_name ==="
+  echo "Source: $REMOTE_HOST:$remote_dir/"
+  echo "Destination: $project_dir"
+
+  rsync -az --update --progress "$REMOTE_HOST:$remote_dir/" "$project_dir/"
+  echo ""
+}
+
+if [[ -n "${1:-}" ]]; then
+  pull_project "$1"
+elif [[ "$PWD" == "$PROJECTS_DIR/"* ]]; then
+  rel_path="${PWD#$PROJECTS_DIR/}"
+  project="${rel_path%%/*}"
+  pull_project "$project"
+else
+  echo "Pulling all projects from remote artifacts..."
+  echo ""
+  found=0
+  while IFS= read -r project_name; do
+    [[ -n "$project_name" ]] || continue
+    if [[ -d "$PROJECTS_DIR/$project_name" ]]; then
+      pull_project "$project_name"
+      found=$((found + 1))
+    fi
+  done < <(ssh "$REMOTE_HOST" "find '$REMOTE_ROOT' -mindepth 1 -maxdepth 1 -type d -exec basename {} \\;" 2>/dev/null | sort)
+
+  if [[ $found -eq 0 ]]; then
+    echo "No matching projects found"
+    exit 1
+  fi
+
+  echo "Done. Pulled $found project(s)."
+fi

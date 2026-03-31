@@ -25,7 +25,15 @@ projects:
     type: laravel
     editor: zed
     docker_compose: true
+    runtime: container
     path: ~/Projects/better-shoes
+    github_repo: letsrun/better-shoes
+    required_secrets:
+      - .env
+    optional_secrets:
+      - auth.json
+    extras:
+      view_url: http://better-shoes.test
     ports:
       vite: 5174
       nginx: 8020
@@ -34,12 +42,15 @@ projects:
       meilisearch: 7700
       mailpit_smtp: 1031
       mailpit_web: 8031
+    bootstrap_commands:
+      - php artisan migrate --force
 
   - name: framework
     alias: fw
     type: rstats
     editor: positron
     path: ~/Projects/framework
+    github_repo: table1/framework
     ports:
       vite: 5175
 
@@ -49,6 +60,9 @@ projects:
     editor: zed
     docker_compose: true
     path: ~/Projects/framework-site
+    github_repo: table1/framework-site
+    required_secrets:
+      - .env
     extras:
       view_url: http://framework-site.test
     ports:
@@ -66,6 +80,7 @@ projects:
     type: rstats
     editor: positron
     path: ~/Projects/parkukb
+    github_repo: erikwestlund/park-gers
 
   - name: naaccord-data-depot
     alias: na
@@ -78,6 +93,7 @@ projects:
       - .env
     extras:
       view_url: http://naaccord.test
+    architecture_mode: local-build
     ports:
       redis: 6393
       mariadb: 3310
@@ -87,16 +103,13 @@ projects:
       flower: 5555
     bootstrap_commands:
       - deploy/containers/mock-idp/generate-certs.sh
-      - docker compose up -d
-      - docker exec naaccord-test-web python manage.py migrate --noinput
-      - docker exec naaccord-test-web python manage.py seed_init
-      - docker exec naaccord-test-web python manage.py load_test_users
 
   - name: homelab
     alias: hl
     type: utility
     editor: zed
     path: ~/Projects/homelab
+    github_repo: erikwestlund/homelab
 
   - name: flint
     alias: fl
@@ -123,12 +136,14 @@ projects:
     type: rstats
     editor: positron
     path: ~/Projects/tnt-syphilis
+    github_repo: erikwestlund/tnt-syphilis
 
   - name: ohdsi-diabetic-retinopathy-treatment-patterns
     alias: drtp
     type: rstats
     editor: positron
     path: ~/Projects/ohdsi-diabetic-retinopathy-treatment-patterns
+    github_repo: erikwestlund/ohdsi-diabetic-retinopathy-treatment-patterns
 
   - name: mh-missing-data
     alias: mhmi
@@ -147,18 +162,21 @@ projects:
     type: utility
     editor: zed
     path: ~/Projects/r50-code-samples-site
+    github_repo: erikwestlund-nih/code-samples-site
 
   - name: r50-application
     alias: r50
     type: utility
     editor: zed
     path: ~/Projects/r50-application
+    github_repo: erikwestlund/r50-app
 
   - name: geu-legal-gender-recognition
     alias: geulegal
     type: rstats
     editor: positron
     path: ~/Projects/geu-legal-gender-recognition
+    github_repo: erikwestlund/geu-legal-gender-recognition
 
   - name: wordle-group
     alias: wg
@@ -167,6 +185,8 @@ projects:
     docker_compose: true
     path: ~/Projects/wordle-group
     github_repo: https://github.com/OnPequod/wordlegroup
+    required_secrets:
+      - .env
     extras:
       view_url: http://wordlegroup.test
     ports:
@@ -188,7 +208,7 @@ projects:
     alias: obsr
     type: rstats
     editor: positron
-    github_repo: https://github.com/OHDSI-JHU/ME.250.788.SP26
+    github_repo: erikwestlund/obs-r-26
     path: ~/Projects/observational-research-methods-in-r
 
   - name: clinical-data-visualization
@@ -196,6 +216,7 @@ projects:
     type: rstats
     editor: positron
     path: ~/Projects/clinical-data-visualization
+    github_repo: JHBiostatCenter/clinical-data-viz
 
   - name: career
     alias: career
@@ -269,3 +290,4 @@ projects:
     type: rstats
     editor: positron
     path: ~/Projects/peanuts
+    github_repo: erikwestlund/peanuts

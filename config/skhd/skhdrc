@@ -13,16 +13,34 @@ shift + alt - k : /opt/homebrew/bin/yabai -m window --warp north
 shift + alt - l : /opt/homebrew/bin/yabai -m window --warp east
 
 # Resize the focused window.
-shift + alt - 0x2B : /opt/homebrew/bin/yabai -m window --resize left:-80:0 || /opt/homebrew/bin/yabai -m window --resize right:80:0
-shift + alt - 0x2F : /opt/homebrew/bin/yabai -m window --resize left:80:0 || /opt/homebrew/bin/yabai -m window --resize right:-80:0
-shift + alt + cmd - 0x2B : /opt/homebrew/bin/yabai -m window --resize top:0:-80 || /opt/homebrew/bin/yabai -m window --resize bottom:0:80
-shift + alt + cmd - 0x2F : /opt/homebrew/bin/yabai -m window --resize top:0:80 || /opt/homebrew/bin/yabai -m window --resize bottom:0:-80
+shift + alt - 0x2B : /opt/homebrew/bin/yabai -m window --resize left:80:0 || /opt/homebrew/bin/yabai -m window --resize right:-80:0
+shift + alt - 0x2F : /opt/homebrew/bin/yabai -m window --resize left:-80:0 || /opt/homebrew/bin/yabai -m window --resize right:80:0
+shift + alt + cmd - 0x2B : /opt/homebrew/bin/yabai -m window --resize top:0:80 || /opt/homebrew/bin/yabai -m window --resize bottom:0:-80
+shift + alt + cmd - 0x2F : /opt/homebrew/bin/yabai -m window --resize top:0:-80 || /opt/homebrew/bin/yabai -m window --resize bottom:0:80
 
 # Toggle the focused window between tiled and floating.
 alt + cmd - n : /opt/homebrew/bin/yabai -m window --toggle float --grid 4:4:1:1:2:2
 
 # Always open a new Ghostty window on the current workspace.
 alt - return : ~/.config/yabai/open-new-ghostty.sh
+
+# Open a new Ghostty window running btop.
+shift + cmd - m : ~/.bin/ghostty-btop
+
+# Open a new Finder window.
+shift + cmd - f : ~/.bin/finder-new-window
+
+# Focus or launch Fastmail.
+shift + cmd - e : ~/.config/yabai/focus-or-launch-fastmail.sh
+
+# Focus or launch 1Password.
+shift + cmd - 0x2C : ~/.config/yabai/focus-or-launch-1password.sh
+
+# Focus or launch Slack.
+shift + cmd - r : ~/.bin/focus-or-launch-slack
+
+# Open the hotkey cheatsheet in Ghostty.
+alt + cmd - h : ~/.bin/ghostty-cheatsheet
 
 # Always open a new Claude web app window on the current workspace.
 shift + cmd - k : ~/.config/yabai/open-new-claude.sh

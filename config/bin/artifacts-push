@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECTS_DIR="$HOME/Projects"
+REMOTE_HOST="syncthing.lan"
+REMOTE_ROOT="/srv/Files/Erik/WorkArtifacts"
+META="$HOME/.bin/project-meta"
+
+FRAMEWORK_PATTERNS=(
+  "inputs/private/"
+  "reference/private/"
+  "outputs/private/"
+  "framework.db"
+  "framework.db-wal"
+  "framework.db-shm"
+)
+
+resolve_project_name() {
+  local id="$1"
+  if [[ -x "$META" ]]; then
+    "$META" field "$id" name 2>/dev/null || printf '%s' "$id"
+  else
+    printf '%s' "$id"
+  fi
+}
+
+resolve_project_dir() {
+  local id="$1"
+  if [[ -x "$META" ]]; then
+    "$META" field "$id" path 2>/dev/null || printf '%s/%s' "$PROJECTS_DIR" "$id"
+  else
+    printf '%s/%s' "$PROJECTS_DIR" "$id"
+  fi
+}
+
+has_artifacts() {
+  local project_dir="$1"
+  [[ -f "$project_dir/.artifacts" && -s "$project_dir/.artifacts" ]] || [[ -f "$project_dir/settings.yml" ]] || [[ -f "$project_dir/framework.db" ]]
+}
+
+push_project() {
+  local id="$1"
+  local project_name project_dir remote_dir artifacts_file
+  local rsync_args=()
+
+  project_name="$(resolve_project_name "$id")"
+  project_dir="$(resolve_project_dir "$id")"
+  remote_dir="$REMOTE_ROOT/$project_name"
+  artifacts_file="$project_dir/.artifacts"
+
+  if [[ ! -d "$project_dir" ]]; then
+    echo "Error: Project directory not found: $project_dir"
+    return 1
+  fi
+
+  echo "=== $project_name ==="
+  echo "Source: $project_dir"
+  echo "Destination: $REMOTE_HOST:$remote_dir/"
+
+  if [[ -f "$artifacts_file" ]] && [[ -s "$artifacts_file" ]]; then
+    echo "Using patterns from .artifacts"
+    while IFS= read -r pattern || [[ -n "$pattern" ]]; do
+      [[ -z "$pattern" || "$pattern" == \#* ]] && continue
+      parts=""
+      IFS='/' read -ra segments <<< "$pattern"
+      for ((i=0; i<${#segments[@]}-1; i++)); do
+        if [[ -n "${segments[$i]}" ]]; then
+          parts+="${segments[$i]}/"
+          rsync_args+=(--include="$parts")
+        fi
+      done
+      rsync_args+=(--include="$pattern" --include="$pattern**")
+    done < "$artifacts_file"
+  elif [[ -f "$project_dir/settings.yml" ]] || [[ -f "$project_dir/framework.db" ]]; then
+    echo "Detected framework-style project conventions"
+    for pattern in "${FRAMEWORK_PATTERNS[@]}"; do
+      rsync_args+=(--include="$pattern" --include="$pattern**")
+    done
+  else
+    echo "No .artifacts file and no framework.db - skipping"
+    echo ""
+    return 0
+  fi
+
+  rsync_args+=(--exclude='*')
+
+  ssh "$REMOTE_HOST" "mkdir -p '$remote_dir'"
+  rsync -az --update --progress "${rsync_args[@]}" "$project_dir/" "$REMOTE_HOST:$remote_dir/"
+  echo ""
+}
+
+if [[ -n "${1:-}" ]]; then
+  push_project "$1"
+elif [[ "$PWD" == "$PROJECTS_DIR/"* ]]; then
+  rel_path="${PWD#$PROJECTS_DIR/}"
+  project="${rel_path%%/*}"
+  push_project "$project"
+else
+  echo "Pushing all projects with artifacts..."
+  echo ""
+  found=0
+  for project_dir in "$PROJECTS_DIR"/*/; do
+    [[ -d "$project_dir" ]] || continue
+    project="$(basename "$project_dir")"
+    if has_artifacts "$project_dir"; then
+      push_project "$project"
+      found=$((found + 1))
+    fi
+  done
+
+  if [[ $found -eq 0 ]]; then
+    echo "No projects found with artifacts"
+    exit 1
+  fi
+
+  echo "Done. Pushed $found project(s)."
+fi

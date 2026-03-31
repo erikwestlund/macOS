@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+"$HOME/.bin/ghostty-new-window" "less '$HOME/System/docs/hotkeys.md'"

@@ -92,8 +92,8 @@ sketchybar --add item clock right \
             icon.drawing=off \
             label.color=$ITEM_COLOR \
             background.drawing=off \
-            padding_left=8 \
-            padding_right=2 \
+            padding_left=14 \
+            padding_right=14 \
             update_freq=10 \
             script="$PLUGIN_DIR/clock.sh"
 

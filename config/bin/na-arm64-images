@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECT_DIR="$HOME/Projects/naaccord-data-depot"
+REGISTRY="ghcr.io/jhbiostatcenter/naaccord"
+TAG="arm64-dev"
+PLATFORM="linux/arm64"
+
+usage() {
+  cat <<'EOF'
+Usage: na-arm64-images <publish|use-ghcr|use-local>
+
+  publish   Build and push ARM64 dev images to GHCR using tag arm64-dev
+  use-ghcr  Point docker-compose.local.yml at GHCR arm64-dev images
+  use-local Point docker-compose.local.yml at local ARM builds
+EOF
+}
+
+ensure_project() {
+  [ -d "$PROJECT_DIR" ] || { echo "Project not found: $PROJECT_DIR" >&2; exit 1; }
+}
+
+write_local_override() {
+  cat > "$PROJECT_DIR/docker-compose.local.yml" <<'EOF'
+services:
+  mock-idp:
+    build:
+      context: .
+      dockerfile: deploy/containers/mock-idp/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/mock-idp:latest
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/containers/web/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/web:latest
+
+  services:
+    build:
+      context: .
+      dockerfile: deploy/containers/services/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+
+  celery:
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+
+  flower:
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+EOF
+}
+
+write_ghcr_override() {
+  cat > "$PROJECT_DIR/docker-compose.local.yml" <<EOF
+services:
+  mock-idp:
+    image: ${REGISTRY}/mock-idp:${TAG}
+
+  web:
+    image: ${REGISTRY}/web:${TAG}
+
+  services:
+    image: ${REGISTRY}/services:${TAG}
+
+  celery:
+    image: ${REGISTRY}/services:${TAG}
+
+  flower:
+    image: ${REGISTRY}/services:${TAG}
+EOF
+}
+
+publish_arm64() {
+  ensure_project
+  [ -x "$HOME/.bin/ghcr-login" ] && "$HOME/.bin/ghcr-login"
+  cd "$PROJECT_DIR"
+
+  ./deploy/containers/mock-idp/generate-certs.sh
+
+  docker buildx build \
+    --platform "$PLATFORM" \
+    -t "$REGISTRY/mock-idp:$TAG" \
+    -f deploy/containers/mock-idp/Dockerfile \
+    deploy/containers/mock-idp \
+    --push
+
+  docker buildx build \
+    --platform "$PLATFORM" \
+    -t "$REGISTRY/web:$TAG" \
+    -f deploy/containers/web/Dockerfile \
+    . \
+    --push
+
+  docker buildx build \
+    --platform "$PLATFORM" \
+    -t "$REGISTRY/services:$TAG" \
+    -f deploy/containers/services/Dockerfile \
+    . \
+    --push
+}
+
+cmd="${1:-}"
+case "$cmd" in
+  publish)
+    publish_arm64
+    ;;
+  use-ghcr)
+    ensure_project
+    write_ghcr_override
+    ;;
+  use-local)
+    ensure_project
+    write_local_override
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

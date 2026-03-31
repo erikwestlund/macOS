@@ -26,6 +26,8 @@ For a project alias like `na`:
 - `pna`: open project in Positron
 - `dna`: `docker compose up -d`
 - `ddna`: `docker compose down`
+- `pullartna`: pull project artifacts into the repo
+- `pushartna`: push project artifacts from the repo
 - `na`: cd to project code directory
 - `pmna`: cd to project management directory under `~/System/projects`
 
@@ -41,6 +43,24 @@ If a project path exists, it syncs from any of:
 - `~/.secrets/projects-kamal/<project-name>/`
 
 into the project directory.
+
+## Artifacts
+
+Artifacts are synced over SSH to `syncthing.lan:/srv/Files/Erik/WorkArtifacts/<project>/`.
+
+Rules:
+
+- if a project has a `.artifacts` file, those patterns are used as an override
+- otherwise, framework-style data projects are inferred by convention and sync:
+  - `inputs/private/`
+  - `reference/private/`
+  - `outputs/private/`
+  - `framework.db*`
+
+Commands are generated per project:
+
+- `pullart{alias}`
+- `pushart{alias}`
 
 ## Current Seeded Project
 

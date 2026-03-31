@@ -37,9 +37,11 @@
     - age
     - ansible
     - borders
+    - btop
     - composer
     - caddy
     - dnsmasq
+    - doctl
     - duti
     - ffmpeg
     - gh
@@ -56,6 +58,7 @@
     - playwright-cli
     - pngquant
     - poppler
+    - quarto
     - qpdf
     - r
     - rclone
@@ -65,8 +68,10 @@
     - skhd
     - starship
     - syncthing
+    - tailscale
     - tmux
     - unpaper
+    - yt-dlp
     - zsh-autosuggestions
     - zsh-completions
     - zsh-fast-syntax-highlighting
@@ -80,6 +85,7 @@
   ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
   loop:
     - cleanshot
+    - fastmail
     - google-chrome
     - microsoft-office
     - microsoft-teams
@@ -93,6 +99,7 @@
     - t3-code
     - tableplus
     - zed
+    - zotero
     - ghostty
     - zoom
   when: item not in brew_casks.stdout_lines

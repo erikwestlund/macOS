@@ -14,9 +14,23 @@ alias secrets-setup='$HOME/.bin/secrets-setup'
 alias secrets-pull='$HOME/.bin/secrets-pull'
 alias secrets-push='$HOME/.bin/secrets-push'
 alias projectctl='$HOME/.bin/projectctl'
+alias add-task='$HOME/.bin/add-task'
+alias vault-view='$HOME/.bin/vault-view'
+alias na-arm64='$HOME/.bin/na-arm64-images'
 
 # Project-specific helpers
 alias seedpeqauth='(cd ~/Projects/pequod && docker compose exec -T php php artisan db:seed --class=WorkflowTestAccountSeeder --force)'
+alias seedna='(cd ~/Projects/naaccord-data-depot && docker exec naaccord-test-web python manage.py seed_init)'
+alias seednausers='(cd ~/Projects/naaccord-data-depot && docker exec naaccord-test-web python manage.py load_test_users)'
+restore-bs() {
+  local file="$1"
+  if [[ -z "$file" ]]; then
+    echo "usage: restore-bs <dump.sql>"
+    return 1
+  fi
+  (cd ~/Projects/better-shoes && docker exec -i better-shoes-postgres psql -U better_shoes -d better_shoes < "storage/app/dumps/$file")
+}
+alias bs-media-sync='rclone sync better-shoes-r2:better-shoes better-shoes-minio:better-shoes-default --progress'
 
 # Navigation
 alias ..='cd ..'

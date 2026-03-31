@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cmd="${1:-}"
+
+if [[ -n "$cmd" ]]; then
+  osascript - "$cmd" <<'EOF'
+on run argv
+  set cmd to item 1 of argv
+  tell application "Ghostty" to activate
+  delay 0.15
+  tell application "System Events"
+    keystroke "n" using command down
+    delay 0.15
+    keystroke cmd
+    key code 36
+  end tell
+end run
+EOF
+else
+  osascript <<'EOF'
+tell application "Ghostty" to activate
+delay 0.15
+tell application "System Events"
+  keystroke "n" using command down
+end tell
+EOF
+fi

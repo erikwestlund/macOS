@@ -73,6 +73,15 @@ What is still generic and not yet parity with Omarchy:
 - port allocation logic in `pm-new`
 - repo-specific Docker ARM64 adjustments inside existing project repos
 
+For rstats/framework-style projects, artifact sync is now convention-based by default:
+
+- `inputs/private/`
+- `reference/private/`
+- `outputs/private/`
+- `framework.db*`
+
+`.artifacts` remains available only as an override when a project does not follow the standard structure.
+
 ## Deep Port Tracking
 
 ### 1. Laravel: `peq`
@@ -99,9 +108,44 @@ Still needed:
 - wildcard `*.academic.test` local routing via later `dnsmasq` / `caddy` port
 - ARM64 vs amd64 compose strategy inside project repo
 
+### Additional Laravel Projects
+
+#### `fl`
+
+Status: locally working
+
+- repo cloned
+- switched to `dev`
+- local domain `flint.test` works
+- full app stack runs locally
+- queue stable after creating Laravel runtime dirs
+
+#### `fws`
+
+Status: locally working
+
+- repo cloned
+- required `.env` deployed
+- app stack runs locally
+- local domain `framework-site.test` works
+- Docker-local env corrected to use Postgres/Redis/Mailpit/MinIO
+- frontend assets built so Vite manifest exists
+
+#### `wg`
+
+Status: locally working
+
+- repo cloned
+- required `.env` deployed
+- shared `mailpit_default` network and `mailpit` container handled locally
+- app stack runs locally
+- local domain `wordlegroup.test` works
+- Docker-local env aligned with checked-in Docker workflow
+- frontend assets built so Vite manifest exists
+
 ### 2. R/stats: `cholera`
 
-Status: in progress
+Status: ported
 
 Implemented:
 
@@ -110,6 +154,16 @@ Implemented:
 - Positron-first editor default
 - `renv` restore attempt during bootstrap
 - npm install if frontend exists
+- project follows standard Framework/private-data conventions
+- artifact helpers now exist and use convention-first sync:
+  - `pullartcholera`
+  - `pushartcholera`
+- tmux/editor command set is live:
+  - `scholera`
+  - `bcholera`
+  - `tmcholera`
+  - `tcholera`
+  - `pcholera`
 
 Still needed:
 
@@ -117,16 +171,35 @@ Still needed:
 - project env deployment expectations
 - optional Python/R mixed workflow helpers
 
+### Approved Stats/Data Projects
+
+These are approved for porting under the same rstats/framework-style conventions:
+
+- `fw` -> `framework` (bootstrapped)
+- `park` -> `parkukb` (bootstrapped)
+- `canehr` -> `cannabis-ehr` (bootstrapped)
+- `peanuts` -> `peanuts` (bootstrapped)
+- `aitools` -> `ai-tools-for-data-science-and-statistics` (bootstrapped)
+
+Port-only, not yet to bootstrap:
+
+- `r50` -> `r50-application` (cloned/setup only)
+- `r50code` -> `r50-code-samples-site` (cloned/setup only)
+
 ### 3. Python: `na`
 
-Status: in progress
+Status: locally working
 
 Implemented:
 
 - imported registry entry and alias set
 - bootstrap clones repo if needed
 - required `.env` secret copy
-- docker build during bootstrap
+- local domain `naaccord.test` works
+- local ARM dev override introduced:
+  - local build for `mock-idp`, `web`, and `services`
+  - same local image reused by `celery` and `flower`
+- stack runs locally on Apple Silicon
 - project-specific bootstrap commands:
   - mock-idp cert generation
   - `docker compose up -d`
@@ -138,6 +211,7 @@ Still needed:
 
 - tmux session parity
 - project secrets behavior validation
+- optional `django_celery_beat` migration handling if needed for local worker/flower parity
 
 ## ARM64 Note
 
@@ -152,6 +226,15 @@ Current status:
 - this repo now has the project control layer
 - it does not yet rewrite or patch existing project repo Dockerfiles/compose files
 - ARM64 compatibility still needs to be handled inside the project repos themselves
+- `naaccord-data-depot` now demonstrates the intended pattern:
+  - dev on Apple Silicon can use local ARM builds
+  - production-oriented GHCR/build scripts can remain `linux/amd64`
+
+For `na`, the system repo now provides a helper to streamline ARM dev images:
+
+- `na-arm64 publish` builds and pushes ARM64 dev images to GHCR with tag `arm64-dev`
+- `na-arm64 use-ghcr` switches the local override to pull those ARM64 dev tags
+- `na-arm64 use-local` switches back to local ARM builds
 
 Recommended next step for Docker:
 

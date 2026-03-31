@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+url="${1:-}"
+
+if [[ -n "$url" ]]; then
+  osascript - "$url" <<'EOF'
+on run argv
+  set targetUrl to item 1 of argv
+  tell application "Google Chrome"
+    activate
+    make new window
+    set URL of active tab of front window to targetUrl
+  end tell
+end run
+EOF
+else
+  osascript <<'EOF'
+tell application "Google Chrome"
+  activate
+  make new window
+end tell
+EOF
+fi

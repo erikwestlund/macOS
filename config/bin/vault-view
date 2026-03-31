@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECTS_DIR="$HOME/Projects"
+MAIN_VAULT="$HOME/System/ansible/vault/secrets.yml"
+
+vault_file=""
+
+if [[ "$PWD" == "$PROJECTS_DIR"/* ]]; then
+  project_path="${PWD#$PROJECTS_DIR/}"
+  project_name="${project_path%%/*}"
+  project_root="$PROJECTS_DIR/$project_name"
+
+  for path in \
+    "$project_root/ansible/vault/secrets.yml" \
+    "$project_root/vault/secrets.yml" \
+    "$PWD/vault/secrets.yml" \
+    "$PWD/secrets.yml"; do
+    if [[ -f "$path" ]]; then
+      vault_file="$path"
+      echo "Using project vault: $vault_file"
+      break
+    fi
+  done
+fi
+
+if [[ -z "$vault_file" ]]; then
+  vault_file="$MAIN_VAULT"
+  echo "Using main vault: $vault_file"
+fi
+
+if [[ ! -f "$vault_file" ]]; then
+  echo "Error: Vault file not found: $vault_file" >&2
+  exit 1
+fi
+
+VAULT_ARGS=()
+if [[ -f "$HOME/.vault_pass" ]]; then
+  VAULT_ARGS+=(--vault-password-file "$HOME/.vault_pass")
+fi
+
+ansible-vault view "${VAULT_ARGS[@]}" "$vault_file"

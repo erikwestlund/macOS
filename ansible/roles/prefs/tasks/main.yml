@@ -220,6 +220,25 @@
     validate: "/usr/sbin/visudo -cf %s"
   when: yabai_check.stat.exists
 
+- name: Stop legacy yabai launch agent
+  ansible.builtin.command:
+    cmd: >-
+      launchctl bootout gui/{{ ansible_facts.user_uid }}
+      {{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.asmvik.yabai.plist
+  failed_when: false
+  changed_when: false
+
+- name: Remove legacy yabai launch agent plist
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.asmvik.yabai.plist"
+    state: absent
+
+- name: Stop yabai service before restart
+  ansible.builtin.command: "{{ yabai_bin }} --stop-service"
+  when: yabai_check.stat.exists
+  failed_when: false
+  changed_when: false
+
 - name: Start yabai service
   ansible.builtin.command: "{{ yabai_bin }} --start-service"
   when: yabai_check.stat.exists

@@ -26,6 +26,8 @@ ensure_project_loaded() {
   PROJECT_PM_DIR="$SYSTEM_PROJECTS_DIR/$PROJECT_NAME"
   PROJECT_VIEW_URL="$(project_value '.extras.view_url // ""')"
   PROJECT_DOCKER_COMPOSE="$(project_value '.docker_compose // false')"
+  PROJECT_RUNTIME="$(project_value '.runtime // "container"')"
+  PROJECT_ARCH_MODE="$(project_value '.architecture_mode // "default"')"
   PROJECT_GITHUB_REPO="$(project_value '.github_repo // ""')"
   PROJECT_REQUIRED_SECRETS="$(project_value '.required_secrets // [] | join("\n")')"
   PROJECT_OPTIONAL_SECRETS="$(project_value '.optional_secrets // [] | join("\n")')"
@@ -109,24 +111,233 @@ ensure_laravel_runtime_dirs() {
     "$PROJECT_DIR/storage/framework/views"
 }
 
+generate_naaccord_local_override() {
+  cat > "$PROJECT_DIR/docker-compose.local.yml" <<'EOF'
+services:
+  mock-idp:
+    build:
+      context: .
+      dockerfile: deploy/containers/mock-idp/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/mock-idp:latest
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/containers/web/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/web:latest
+
+  services:
+    build:
+      context: .
+      dockerfile: deploy/containers/services/Dockerfile
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+
+  celery:
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+
+  flower:
+    image: ghcr.io/jhbiostatcenter/naaccord/services:latest
+EOF
+}
+
+compose_cmd() {
+  if [ "$PROJECT_NAME" = "better-shoes" ] && [ -f "$PROJECT_DIR/docker-compose.local.generated.yml" ]; then
+    echo "docker compose -f docker-compose.local.generated.yml"
+  elif [ "$PROJECT_NAME" = "naaccord-data-depot" ] && [ -f "$PROJECT_DIR/docker-compose.local.yml" ]; then
+    echo "docker compose -f docker-compose.yml -f docker-compose.local.yml"
+  else
+    echo "docker compose"
+  fi
+}
+
+ensure_shared_mailpit() {
+  if ! docker network inspect mailpit_default >/dev/null 2>&1; then
+    docker network create mailpit_default >/dev/null 2>&1 || true
+  fi
+
+  if ! docker ps --format '{{.Names}}' | grep -q '^mailpit$'; then
+    docker rm -f mailpit >/dev/null 2>&1 || true
+    docker run -d --name mailpit --network mailpit_default -p 127.0.0.1:1025:1025 -p 127.0.0.1:8025:8025 axllent/mailpit:latest >/dev/null 2>&1 || true
+  fi
+}
+
+generate_better_shoes_compose() {
+  local reference_project="$HOME/Projects/pequod"
+
+  cat > "$PROJECT_DIR/docker-compose.local.generated.yml" <<'EOF'
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: better-shoes-php
+    restart: on-failure
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - better-shoes-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_started
+    environment:
+      - PHP_MEMORY_LIMIT=512M
+
+  nginx:
+    image: nginx:alpine
+    container_name: better-shoes-nginx
+    restart: on-failure
+    ports:
+      - "127.0.0.1:8020:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - better-shoes-network
+    depends_on:
+      - php
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: better-shoes-postgres
+    restart: on-failure
+    environment:
+      POSTGRES_DB: better_shoes
+      POSTGRES_USER: better_shoes
+      POSTGRES_PASSWORD: better-shoes-dev-secret
+    volumes:
+      - ${DOCKER_DATA_DIR:-./storage/docker}/postgres:/var/lib/postgresql/data
+      - ./storage/app/dumps:/dumps
+    ports:
+      - "127.0.0.1:5433:5432"
+    networks:
+      - better-shoes-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U better_shoes -d better_shoes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: better-shoes-redis
+    restart: on-failure
+    volumes:
+      - ${DOCKER_DATA_DIR:-./storage/docker}/redis:/data
+    ports:
+      - "127.0.0.1:6380:6379"
+    networks:
+      - better-shoes-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: better-shoes-meilisearch
+    restart: on-failure
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: better-shoes-dev-secret
+      MEILI_NO_ANALYTICS: true
+    volumes:
+      - ${DOCKER_DATA_DIR:-./storage/docker}/meilisearch:/meili_data
+    ports:
+      - "127.0.0.1:7700:7700"
+    networks:
+      - better-shoes-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: better-shoes-mailpit
+    restart: on-failure
+    ports:
+      - "127.0.0.1:1026:1025"
+      - "127.0.0.1:8026:8025"
+    networks:
+      - better-shoes-network
+
+  r-executor:
+    image: ghcr.io/letsrun/better-shoes-r-executor:latest
+    container_name: better-shoes-r-executor
+    platform: linux/amd64
+    volumes:
+      - .:/app:rw
+      - ./.env:/app/.env:ro
+    networks:
+      - better-shoes-network
+    environment:
+      - DOCKER_CONTAINER=true
+      - DB_HOST=postgres
+      - DB_DATABASE=better_shoes
+      - DB_USERNAME=better_shoes
+      - DB_PASSWORD=better-shoes-dev-secret
+      - DB_PORT=5432
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: tail -f /dev/null
+
+networks:
+  better-shoes-network:
+    driver: bridge
+EOF
+
+  if [ -d "$reference_project/docker/php" ]; then
+    mkdir -p "$PROJECT_DIR/docker/php"
+    cp "$reference_project/docker/php/Dockerfile" "$PROJECT_DIR/docker/php/" 2>/dev/null || true
+    cp "$reference_project/docker/php/php.ini" "$PROJECT_DIR/docker/php/" 2>/dev/null || true
+  fi
+
+  if [ -d "$reference_project/docker/nginx" ]; then
+    mkdir -p "$PROJECT_DIR/docker/nginx"
+    cp "$reference_project/docker/nginx/default.conf" "$PROJECT_DIR/docker/nginx/" 2>/dev/null || true
+  fi
+
+  mkdir -p "$PROJECT_DIR/storage/app/media"
+  ln -sf "$PROJECT_DIR/storage/app/media" "$PROJECT_DIR/public/media"
+}
+
 bootstrap_laravel() {
   ensure_laravel_runtime_dirs
   ensure_docker_data_dir
-  if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
-    (cd "$PROJECT_DIR" && docker compose build)
+  if [ "$PROJECT_NAME" = "better-shoes" ]; then
+    generate_better_shoes_compose
+    if [ -x "$HOME/.bin/ghcr-login" ]; then
+      "$HOME/.bin/ghcr-login" >/dev/null 2>&1 || true
+    fi
   fi
-  if [ -f "$PROJECT_DIR/composer.json" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
-    (cd "$PROJECT_DIR" && docker compose run --rm php composer install)
+  if [ "$PROJECT_NAME" = "wordle-group" ]; then
+    ensure_shared_mailpit
   fi
-  if [ -f "$PROJECT_DIR/package.json" ]; then
-    (cd "$PROJECT_DIR" && npm install)
+  if [ "$PROJECT_RUNTIME" != "herd" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    (cd "$PROJECT_DIR" && $(compose_cmd) build)
+  fi
+  if [ "$PROJECT_RUNTIME" != "herd" ] && [ -f "$PROJECT_DIR/composer.json" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    (cd "$PROJECT_DIR" && $(compose_cmd) up -d)
+    (cd "$PROJECT_DIR" && $(compose_cmd) exec -T php composer install --no-interaction --prefer-dist --optimize-autoloader)
+  fi
+  if [ "$PROJECT_RUNTIME" != "herd" ] && [ -f "$PROJECT_DIR/package.json" ]; then
+    (cd "$PROJECT_DIR" && $(compose_cmd) exec -T php npm install)
   fi
 }
 
 bootstrap_python() {
   ensure_docker_data_dir
+  if [ "$PROJECT_NAME" = "naaccord-data-depot" ] && [ "$PROJECT_ARCH_MODE" = "local-build" ]; then
+    generate_naaccord_local_override
+  fi
   if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
-    (cd "$PROJECT_DIR" && docker compose build)
+    (cd "$PROJECT_DIR" && $(compose_cmd) build)
   fi
   if [ -f "$PROJECT_DIR/package.json" ]; then
     (cd "$PROJECT_DIR" && npm install)
@@ -134,6 +345,12 @@ bootstrap_python() {
 }
 
 bootstrap_rstats() {
+  if [ -f "$PROJECT_DIR/DESCRIPTION" ]; then
+    (cd "$PROJECT_DIR" && Rscript -e "dir.create(Sys.getenv('R_LIBS_USER'), recursive = TRUE, showWarnings = FALSE); for (pkg in c('devtools','remotes')) { if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg, repos = 'https://cloud.r-project.org', lib = Sys.getenv('R_LIBS_USER')) }; devtools::install_deps()") || true
+    if [ "$PROJECT_NAME" = "framework" ]; then
+      (cd "$PROJECT_DIR" && Rscript -e "remotes::install_git('https://github.com/table1/framework')") || true
+    fi
+  fi
   if [ -f "$PROJECT_DIR/renv.lock" ]; then
     (cd "$PROJECT_DIR" && Rscript -e 'if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv", repos = "https://cloud.r-project.org"); renv::restore(prompt = FALSE)') || true
   fi
@@ -162,6 +379,9 @@ setup_project() {
 
   if [ "$PROJECT_TYPE" = "laravel" ]; then
     ensure_laravel_runtime_dirs
+    if [ "$PROJECT_NAME" = "wordle-group" ] && [ -f "$PROJECT_DIR/.env.docker" ]; then
+      cp "$PROJECT_DIR/.env.docker" "$PROJECT_DIR/.env"
+    fi
   fi
 
   if [ "$PROJECT_TYPE" = "python" ]; then
@@ -259,6 +479,12 @@ case "$cmd" in
       python) bootstrap_python ;;
       rstats) bootstrap_rstats ;;
     esac
+    if [ "$PROJECT_NAME" = "naaccord-data-depot" ]; then
+      (cd "$PROJECT_DIR" && $(compose_cmd) up -d)
+      docker exec naaccord-test-web python manage.py migrate --noinput
+      docker exec naaccord-test-web python manage.py seed_init
+      docker exec naaccord-test-web python manage.py load_test_users
+    fi
     run_bootstrap_commands
     if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
       true
@@ -274,14 +500,14 @@ case "$cmd" in
     mkdir -p "$PROJECT_PM_DIR"
     deploy_project_secrets
     if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
-      (cd "$PROJECT_DIR" && docker compose up -d)
+      (cd "$PROJECT_DIR" && $(compose_cmd) up -d)
     fi
     ensure_tmux_session
     ;;
   kill)
     ensure_project_loaded
     if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
-      (cd "$PROJECT_DIR" && docker compose down)
+      (cd "$PROJECT_DIR" && $(compose_cmd) down)
     fi
     tmux kill-session -t "$PROJECT_ALIAS" 2>/dev/null || true
     ;;
@@ -294,7 +520,7 @@ case "$cmd" in
   term)
     ensure_project_loaded
     ensure_path_exists
-    /usr/bin/open -na "/Applications/Ghostty.app" --args +new-window --working-directory="$PROJECT_DIR" --command="zsh -lc '$HOME/.bin/projectctl tmux $PROJECT_ALIAS'"
+    "$HOME/.bin/ghostty-new-window" "cd '$PROJECT_DIR' && $HOME/.bin/projectctl tmux $PROJECT_ALIAS"
     ;;
   zed)
     ensure_project_loaded
@@ -314,12 +540,12 @@ case "$cmd" in
   up)
     ensure_project_loaded
     ensure_path_exists
-    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && docker compose up -d)
+    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && $(compose_cmd) up -d)
     ;;
   down)
     ensure_project_loaded
     ensure_path_exists
-    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && docker compose down)
+    [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ] && (cd "$PROJECT_DIR" && $(compose_cmd) down)
     ;;
   deploy-secrets)
     if [ "${id:-}" = "--all" ] || [ -z "${id:-}" ]; then

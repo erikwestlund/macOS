@@ -52,6 +52,8 @@ when 'aliases'
     puts "alias p#{a}='$HOME/.bin/projectctl positron #{a}'"
     puts "alias d#{a}='$HOME/.bin/projectctl up #{a}'"
     puts "alias dd#{a}='$HOME/.bin/projectctl down #{a}'"
+    puts "alias pullart#{a}='$HOME/.bin/artifacts-pull #{a}'"
+    puts "alias pushart#{a}='$HOME/.bin/artifacts-push #{a}'"
     puts "function #{a}() { cd \"$($HOME/.bin/project-meta field #{a} path)\"; }"
     puts "function pm#{a}() { mkdir -p \"#{File.join(root, n)}\"; cd \"#{File.join(root, n)}\"; }"
   end

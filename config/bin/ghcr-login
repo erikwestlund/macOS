@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ENV_FILE="$HOME/.config/ghcr/env"
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "GHCR env file not found: $ENV_FILE" >&2
+  exit 1
+fi
+
+source "$ENV_FILE"
+
+if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then
+  echo "Missing GHCR credentials" >&2
+  exit 1
+fi
+
+printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin

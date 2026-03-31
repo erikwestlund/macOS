@@ -1,3 +1,5 @@
+setopt AUTO_CD
+
 autoload -Uz compinit
 compinit
 
