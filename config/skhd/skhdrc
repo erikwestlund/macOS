@@ -45,8 +45,8 @@ alt + cmd - h : ~/.bin/ghostty-cheatsheet
 # Always open a new Claude web app window on the current workspace.
 shift + cmd - k : ~/.config/yabai/open-new-claude.sh
 
-# Always open a new ChatGPT web app window on the current workspace.
-shift + cmd - a : ~/.config/yabai/open-new-chatgpt.sh
+# Focus or launch the ChatGPT app.
+shift + cmd - a : ~/.config/yabai/focus-or-launch-chatgpt.sh
 
 # Always open a new Google Chrome window on the current workspace.
 shift + cmd - b : ~/.config/yabai/open-new-chrome.sh

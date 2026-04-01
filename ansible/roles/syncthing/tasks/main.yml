@@ -125,10 +125,9 @@
     - syncthing_check.stat.exists
     - syncthing_work_folder_id not in syncthing_folders.stdout
 
-- name: Create Work .stignore
-  ansible.builtin.copy:
-    dest: "{{ syncthing_work_path }}/.stignore"
-    content: "OneDrive\n"
-    mode: "0644"
-    force: false
+- name: Remove OneDrive ignore from Work .stignore
+  ansible.builtin.lineinfile:
+    path: "{{ syncthing_work_path }}/.stignore"
+    regexp: '^OneDrive$'
+    state: absent
   when: syncthing_check.stat.exists

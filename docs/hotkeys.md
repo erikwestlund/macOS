@@ -5,7 +5,7 @@ This file is the current diary of global hotkeys managed in this repo.
 ## Launchers
 
 - `Option+Enter`: always open a new `Ghostty` window on the current workspace
-- `Command+Shift+M`: open a new `Ghostty` window running `btop`
+- `Command+Shift+M`: open a centered floating `Ghostty` window running `btop`
 - `Command+Shift+F`: open a new Finder window
 - `Command+Shift+E`: focus or launch Fastmail
 - `Command+Shift+P`: focus or launch 1Password

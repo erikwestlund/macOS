@@ -6,9 +6,9 @@ SPACE_LABELS=(1 2 3 4 5 6 7 8 9 10 11 12)
 BAR_COLOR=0xb8141820
 GROUP_COLOR=0x801b2028
 GROUP_BORDER_COLOR=0x406f7a86
-ITEM_COLOR=0xffeef2f6
+ITEM_COLOR=0xffabc5da
 MUTED_COLOR=0xb389939e
-ACCENT_TEXT_COLOR=0xffffffff
+ACCENT_TEXT_COLOR=0xffbdd8ec
 
 sketchybar --bar \
   position=top \
@@ -54,8 +54,13 @@ for i in "${!SPACE_LABELS[@]}"; do
              updates=on \
              update_freq=2 \
              background.drawing=off \
+             popup.background.color=0xf01b2028 \
+             popup.background.border_color=$GROUP_BORDER_COLOR \
+             popup.background.border_width=1 \
+             popup.background.corner_radius=12 \
+             popup.height=26 \
              script="$PLUGIN_DIR/space.sh" \
-             click_script="/opt/homebrew/bin/yabai -m space --focus $sid"
+             click_script="$PLUGIN_DIR/space_popup.sh $sid"
 done
 
 sketchybar --set space.1 padding_left=4
@@ -89,12 +94,88 @@ sketchybar --add item front_app center \
 
 sketchybar --add item clock right \
            --set clock \
-            icon.drawing=off \
-            label.color=$ITEM_COLOR \
-            background.drawing=off \
-            padding_left=14 \
-            padding_right=14 \
-            update_freq=10 \
-            script="$PLUGIN_DIR/clock.sh"
+             icon.drawing=off \
+             label.color=$ITEM_COLOR \
+             background.drawing=off \
+             padding_left=18 \
+             padding_right=14 \
+             update_freq=10 \
+             script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item battery right \
+           --set battery \
+             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+             icon.padding_right=4 \
+             label.color=$ITEM_COLOR \
+             background.drawing=off \
+             padding_left=13 \
+             padding_right=12 \
+             popup.background.color=0xf01b2028 \
+             popup.background.border_color=$GROUP_BORDER_COLOR \
+             popup.background.border_width=1 \
+             popup.background.corner_radius=12 \
+             popup.height=24 \
+             update_freq=15 \
+             script="$PLUGIN_DIR/battery.sh" \
+             click_script="$PLUGIN_DIR/battery.sh popup"
+
+sketchybar --add item btop right \
+           --set btop \
+             icon="" \
+             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+             icon.color=$ITEM_COLOR \
+             label.drawing=off \
+             background.drawing=off \
+             padding_left=19 \
+             padding_right=12 \
+             popup.background.color=0xf01b2028 \
+             popup.background.border_color=$GROUP_BORDER_COLOR \
+             popup.background.border_width=1 \
+             popup.background.corner_radius=12 \
+             popup.background.padding_top=4 \
+             popup.background.padding_bottom=4 \
+             popup.height=32 \
+             click_script="$PLUGIN_DIR/system_monitor.sh popup"
+
+sketchybar --add item tmux right \
+           --set tmux \
+             icon="" \
+             icon.font="JetBrainsMono Nerd Font:Regular:10.0" \
+             icon.padding_right=2 \
+             label.padding_left=0 \
+             label.padding_right=0 \
+             label.color=$ITEM_COLOR \
+             background.drawing=off \
+             padding_left=12 \
+             padding_right=12 \
+             popup.background.color=0xf01b2028 \
+             popup.background.border_color=$GROUP_BORDER_COLOR \
+             popup.background.border_width=1 \
+             popup.background.corner_radius=12 \
+             popup.height=28 \
+             update_freq=5 \
+             script="$PLUGIN_DIR/tmux.sh" \
+             click_script="$PLUGIN_DIR/tmux.sh popup"
+
+sketchybar --add item tailscale right \
+           --set tailscale \
+             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+             background.drawing=off \
+             padding_left=12 \
+             padding_right=12 \
+             update_freq=15 \
+             script="$PLUGIN_DIR/tailscale.sh"
+
+sketchybar --add item now_playing right \
+           --set now_playing \
+             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+             icon.padding_right=4 \
+             label.max_chars=36 \
+             label.color=$ITEM_COLOR \
+             background.drawing=off \
+             padding_left=12 \
+             padding_right=12 \
+             update_freq=5 \
+             script="$PLUGIN_DIR/now_playing.sh"
 
 sketchybar --update

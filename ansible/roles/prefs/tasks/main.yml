@@ -27,6 +27,21 @@
     - SystemUIServer
   when: set_natural_scroll is defined and set_natural_scroll is changed
 
+- name: Read Finder default view preference
+  ansible.builtin.command: defaults read com.apple.finder FXPreferredViewStyle
+  register: finder_view_style
+  changed_when: false
+  failed_when: false
+
+- name: Set Finder default view to Column View
+  ansible.builtin.command: defaults write com.apple.finder FXPreferredViewStyle -string clmv
+  register: set_finder_view_style
+  when: finder_view_style.stdout != "clmv"
+
+- name: Restart Finder after view preference change
+  ansible.builtin.command: killall Finder
+  when: set_finder_view_style is defined and set_finder_view_style is changed
+
 - name: Read trackpad tap-to-click preference
   ansible.builtin.command: defaults read com.apple.AppleMultitouchTrackpad Clicking
   register: trackpad_tap_to_click

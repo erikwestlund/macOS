@@ -13,7 +13,7 @@ git clone https://github.com/erikwestlund/system ~/System
 
 # 3. Install core tools
 brew install --cask 1password
-brew install ansible rclone age
+brew install ansible age
 
 # 4. Set up ansible vault password
 echo 'your-vault-password' > ~/.vault_pass
@@ -24,14 +24,14 @@ chmod 600 ~/.vault_pass
 ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/playbook.yml -K
 ```
 
-The first playbook run is also the secrets bootstrap. It reads `ansible/vault/secrets.yml`, writes `~/.config/secrets/config`, and runs `secrets-pull` so `~/.secrets` is populated before secrets-backed roles are applied.
+The first playbook run is also the secrets bootstrap. This repo already includes the encrypted `ansible/vault/secrets.yml` file, so unlike Omarchy there is no separate manual `rclone copy ...` bootstrap step to fetch it first. Ansible reads that vault file, writes `~/.config/secrets/config`, installs the upstream `rclone` binary on macOS, and runs `secrets-pull`, which syncs encrypted secrets from Backblaze B2 into `~/.secrets` before secrets-backed roles are applied.
 
 ## Secrets
 
 Secrets are required for a working setup on a new machine.
 
 ```bash
-# Re-sync encrypted secrets into ~/.secrets/
+# Re-sync encrypted secrets from Backblaze B2 into ~/.secrets/
 secrets-pull
 
 # Re-deploy secrets-backed files into their final locations
@@ -42,6 +42,7 @@ ms-secrets
 
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `ms-secrets` deploys them into final locations.
+- `rclone` is installed from the upstream release by Ansible on macOS instead of Homebrew.
 - macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
