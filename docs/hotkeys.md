@@ -58,14 +58,14 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Command+Option+H`: open the floating fixed-width cheatsheet in Ghostty
 - `Option+Shift+M`: toggle the system monitor popup
 - `Control+Shift+M`: focus or launch `Messages`
-- `Command+Option+T`: toggle the tmux popup
+- `Option+Shift+T`: toggle the tmux popup
 - `Control+Shift+J`: focus or launch Ivanti Secure Access
 - `Control+Shift+V`: focus or launch Tailscale
 - `Control+Option+0`: restore workspace `10` layout: Outlook left, Teams right
 - `Control+Option+-`: restore workspace `11` layout: Fastmail left, Morgen right
 - `Control+Option+Y`: restore scratch workspace layout: Messages left, YouTube right
-- `Command+Option+W`: toggle the workspace apps popup
-- `Option+Shift+W`: open the `Weather` app
+- `Option+Shift+W`: toggle the workspace apps popup
+- `Command+Option+W`: open the `Weather` app
 
 ## Project
 

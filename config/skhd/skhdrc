@@ -110,13 +110,13 @@ shift + cmd - t : ~/.config/yabai/focus-or-launch-teams.sh
 shift + cmd - z : ~/.config/yabai/focus-or-launch-zoom.sh
 
 # Toggle the tmux popup.
-alt + cmd - t : NAME=tmux ~/.config/sketchybar/plugins/tmux.sh popup
+shift + alt - t : NAME=tmux ~/.config/sketchybar/plugins/tmux.sh popup
 
 # Toggle the workspace apps popup.
-alt + cmd - w : NAME=workspace_apps ~/.config/sketchybar/plugins/workspace_apps.sh toggle
+shift + alt - w : NAME=workspace_apps ~/.config/sketchybar/plugins/workspace_apps.sh toggle
 
 # Open the Weather app.
-shift + alt - w : open -a Weather
+alt + cmd - w : open -a Weather
 
 # Focus absolute previous/next spaces with wraparound.
 alt - left : ~/.config/yabai/focus-absolute-space.sh prev

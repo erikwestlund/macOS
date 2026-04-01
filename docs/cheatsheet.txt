@@ -8,7 +8,8 @@
 | Opt+Sh+,/.       Wider/Narrower| Cmd+Sh+Y    New YouTube       | Opt+Sh+1..=   Send and follow  |
 | Cmd+Opt+Sh+,/.   Taller/Shorter| Opt+Enter   New Ghostty       | Cmd+Opt+Sh+1..= Send no follow |
 | Cmd+Opt+N        Float / tile  | Cmd+Sh+M    Floating btop     | Opt+Y / Sh+Y Scratch toggle/send|
-| Cmd+Opt+K        Working Memory| Cmd+Sh+D    Lazydocker        | Opt+` / Sh+` Utility toggle/send|
+| Cmd+Opt+M        Focus mode    | Cmd+Sh+D    Lazydocker        | Opt+` / Sh+` Utility toggle/send|
+| Cmd+Opt+K        Working Memory|                                |                                |
 | APPS (FOCUS / LAUNCH)          | UTILS / SCRIPTS               | SYSTEM TASKS                   |
 | Cmd+Sh+E      Fastmail         | pm-new       New project      | mac-sys       Full playbook    |
 | Cmd+Sh+R      Slack            | sso          Organize shots   | mac-packages  Packages only    |
@@ -20,11 +21,13 @@
 | Cmd+Opt+Sh+M  Music            | Cmd+Sh+F    Finder            | secrets-setup Bootstrap secrets|
 |                                | Cmd+Opt+D   Downloads         | vault-view    Vault browser    |
 |                                | Cmd+Opt+H   Cheatsheet        | na-arm64      NA images        |
-|                                | Cmd+Opt+M   Monitor popup     |                                |
-|                                | Cmd+Opt+T   Tmux popup        |                                |
-|                                | Cmd+Opt+W   Workspace popup   |                                |
-|                                | Opt+Sh+W    Weather app       |                                |
-|                                | Opt+Sh+V    Tailscale         |                                |
+|                                | Opt+Sh+M    Monitor popup     |                                |
+|                                | Opt+Sh+T    Tmux popup        |                                |
+|                                | Opt+Sh+W    Workspace popup   |                                |
+|                                | Cmd+Opt+W   Weather app       |                                |
+|                                | Ctrl+Sh+M   Messages          |                                |
+|                                | Ctrl+Sh+J   Ivanti            |                                |
+|                                | Ctrl+Sh+V   Tailscale         |                                |
 |                                |                                |                                |
 | PROJECT PATTERNS               | POSITRON                       | PROJECT ALIASES                |
 | <alias>        cd repo dir     | Cmd+A      Toggle left sidebar | aitools bs canehr career       |
