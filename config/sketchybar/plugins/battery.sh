@@ -8,6 +8,7 @@ battery_info=$(pmset -g batt)
 percentage=$(printf '%s\n' "$battery_info" | grep -Eo '[0-9]+%' | cut -d% -f1)
 
 if [[ -z "$percentage" ]]; then
+  sketchybar --set "$NAME" drawing=off icon="" label="" popup.drawing=off
   exit 0
 fi
 
@@ -27,7 +28,7 @@ show_popup() {
 }
 
 if printf '%s\n' "$battery_info" | grep -q 'AC Power'; then
-  sketchybar --set "$NAME" drawing=off
+  sketchybar --set "$NAME" drawing=off icon="" label="" popup.drawing=off
   exit 0
 fi
 

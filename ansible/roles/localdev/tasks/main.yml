@@ -7,7 +7,7 @@
   become: true
   ansible.builtin.copy:
     src: "{{ system_repo }}/config/macos/ensure-localdev-loopback.sh"
-    dest: /usr/local/bin/ensure-localdev-loopback.sh
+    dest: /opt/homebrew/bin/ensure-localdev-loopback.sh
     remote_src: true
     mode: "0755"
 
@@ -21,7 +21,7 @@
 
 - name: Ensure loopback alias is active now
   become: true
-  ansible.builtin.command: /usr/local/bin/ensure-localdev-loopback.sh
+  ansible.builtin.command: /opt/homebrew/bin/ensure-localdev-loopback.sh
   changed_when: false
 
 - name: Bootstrap localdev loopback LaunchDaemon

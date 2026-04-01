@@ -6,6 +6,10 @@ truncate_text() {
   local text="$1"
   local limit=36
 
+  if [ -f "$HOME/.machine" ] && [ "$(/usr/bin/tr -d '[:space:]' < "$HOME/.machine")" = "desktop" ]; then
+    limit=72
+  fi
+
   if [[ ${#text} -le $limit ]]; then
     printf '%s' "$text"
   else

@@ -7,41 +7,17 @@ window_width_cells=124
 window_height_cells=36
 
 display_json=$(/opt/homebrew/bin/yabai -m query --displays --display)
-space_index=$(/opt/homebrew/bin/yabai -m query --spaces --space | jq -r '.index')
 existing_ids=$(/opt/homebrew/bin/yabai -m query --windows | jq '[.[] | select(.app == "Ghostty") | .id]')
 
-usable_frame=$(
-  /opt/homebrew/bin/yabai -m query --windows | jq -c --argjson space "$space_index" '
-    [ .[]
-      | select(.space == $space)
-      | select(."has-ax-reference" == true)
-      | select(."is-floating" == false)
-      | select(."is-native-fullscreen" == false)
-      | select(."is-minimized" == false)
-    ] as $wins
-    | if ($wins | length) > 0 then
-        {
-          x: ($wins | map(.frame.x) | min | floor),
-          y: ($wins | map(.frame.y) | min | floor),
-          w: (($wins | map(.frame.x + .frame.w) | max) - ($wins | map(.frame.x) | min) | floor),
-          h: (($wins | map(.frame.y + .frame.h) | max) - ($wins | map(.frame.y) | min) | floor)
-        }
-      else
-        empty
-      end'
-)
-
-if [[ -z "$usable_frame" ]]; then
-  usable_frame=$(printf '%s' "$display_json" | jq -c '{x: (.frame.x + 8 | floor), y: (.frame.y + 40 | floor), w: (.frame.w - 16 | floor), h: (.frame.h - 48 | floor)}')
-fi
+usable_frame=$(printf '%s' "$display_json" | jq -c '{x: (.frame.x + 8 | floor), y: (.frame.y + 40 | floor), w: (.frame.w - 16 | floor), h: (.frame.h - 48 | floor)}')
 
 usable_x=$(printf '%s' "$usable_frame" | jq -r '.x')
 usable_y=$(printf '%s' "$usable_frame" | jq -r '.y')
 usable_w=$(printf '%s' "$usable_frame" | jq -r '.w')
 usable_h=$(printf '%s' "$usable_frame" | jq -r '.h')
 
-estimated_window_w=$(( usable_w * 66 / 100 ))
-estimated_window_h=$(( usable_h * 66 / 100 ))
+estimated_window_w=1200
+estimated_window_h=800
 target_x=$(( usable_x + (usable_w - estimated_window_w) / 2 ))
 target_y=$(( usable_y + (usable_h - estimated_window_h) / 2 ))
 
@@ -67,6 +43,8 @@ for _ in {1..50}; do
   )
 
   if [[ -n "$new_id" ]]; then
+    /opt/homebrew/bin/yabai -m window "$new_id" --resize "abs:${estimated_window_w}:${estimated_window_h}" >/dev/null 2>&1 || true
+    /opt/homebrew/bin/yabai -m window "$new_id" --move "abs:${target_x}:${target_y}" >/dev/null 2>&1 || true
     break
   fi
 

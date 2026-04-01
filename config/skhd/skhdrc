@@ -8,16 +8,20 @@ alt - l : /opt/homebrew/bin/yabai -m window --focus east || /opt/homebrew/bin/ya
 
 # Move windows around inside the current BSP tree.
 shift + alt - h : /opt/homebrew/bin/yabai -m window --warp west
+shift + alt - j : /opt/homebrew/bin/yabai -m window --warp south
 
 # Focus or launch Ivanti Secure Access.
-shift + alt - j : ~/.config/yabai/focus-or-launch-ivanti.sh
+shift + ctrl - j : ~/.config/yabai/focus-or-launch-ivanti.sh
 
 # Move windows around inside the current BSP tree.
 shift + alt - k : /opt/homebrew/bin/yabai -m window --warp north
 shift + alt - l : /opt/homebrew/bin/yabai -m window --warp east
 
 # Focus or launch Tailscale.
-shift + alt - v : ~/.config/yabai/focus-or-launch-tailscale.sh
+shift + ctrl - v : ~/.config/yabai/focus-or-launch-tailscale.sh
+
+# Focus or launch Messages.
+shift + ctrl - m : ~/.config/yabai/focus-or-launch-messages.sh
 
 # Snap the focused tiled window to a half-screen side.
 shift + alt + cmd - h : ~/.config/yabai/snap-window.sh west
@@ -34,8 +38,8 @@ shift + alt + cmd - 0x2F : /opt/homebrew/bin/yabai -m window --resize top:0:-80 
 # Toggle the focused window between tiled and floating.
 alt + cmd - n : /opt/homebrew/bin/yabai -m window --toggle float --grid 4:4:1:1:2:2
 
-# Toggle Omarchy-style focus mode while preserving the current frame.
-alt + cmd - m : ~/.config/yabai/focus-mode.sh
+# Toggle the system monitor popup.
+shift + alt - m : ~/.config/sketchybar/plugins/system_monitor.sh popup
 
 # Always open a new Ghostty window on the current workspace.
 alt - return : ~/.config/yabai/open-new-ghostty.sh
@@ -97,6 +101,15 @@ shift + cmd - t : ~/.config/yabai/focus-or-launch-teams.sh
 # Focus or launch Zoom.
 shift + cmd - z : ~/.config/yabai/focus-or-launch-zoom.sh
 
+# Toggle the tmux popup.
+alt + cmd - t : NAME=tmux ~/.config/sketchybar/plugins/tmux.sh popup
+
+# Toggle the workspace apps popup.
+alt + cmd - w : NAME=workspace_apps ~/.config/sketchybar/plugins/workspace_apps.sh toggle
+
+# Open the Weather app.
+shift + alt - w : open -a Weather
+
 # Focus absolute previous/next spaces with wraparound.
 alt - left : ~/.config/yabai/focus-absolute-space.sh prev
 alt - right : ~/.config/yabai/focus-absolute-space.sh next
@@ -118,18 +131,18 @@ alt - 0x32 : ~/.config/yabai/toggle-utility-space.sh
 shift + alt - 0x32 : ~/.config/yabai/send-to-utility-space.sh
 
 # Focus workspaces 1-12 with Option+1-0,-,=
-alt - 1 : /opt/homebrew/bin/yabai -m space --focus 1
-alt - 2 : /opt/homebrew/bin/yabai -m space --focus 2
-alt - 3 : /opt/homebrew/bin/yabai -m space --focus 3
-alt - 4 : /opt/homebrew/bin/yabai -m space --focus 4
-alt - 5 : /opt/homebrew/bin/yabai -m space --focus 5
-alt - 6 : /opt/homebrew/bin/yabai -m space --focus 6
-alt - 7 : /opt/homebrew/bin/yabai -m space --focus 7
-alt - 8 : /opt/homebrew/bin/yabai -m space --focus 8
-alt - 9 : /opt/homebrew/bin/yabai -m space --focus 9
-alt - 0 : /opt/homebrew/bin/yabai -m space --focus 10
-alt - 0x1B : /opt/homebrew/bin/yabai -m space --focus 11
-alt - 0x18 : /opt/homebrew/bin/yabai -m space --focus 12
+alt - 1 : ~/.config/yabai/focus-space.sh 1
+alt - 2 : ~/.config/yabai/focus-space.sh 2
+alt - 3 : ~/.config/yabai/focus-space.sh 3
+alt - 4 : ~/.config/yabai/focus-space.sh 4
+alt - 5 : ~/.config/yabai/focus-space.sh 5
+alt - 6 : ~/.config/yabai/focus-space.sh 6
+alt - 7 : ~/.config/yabai/focus-space.sh 7
+alt - 8 : ~/.config/yabai/focus-space.sh 8
+alt - 9 : ~/.config/yabai/focus-space.sh 9
+alt - 0 : ~/.config/yabai/focus-space.sh 10
+alt - 0x1B : ~/.config/yabai/focus-space.sh 11
+alt - 0x18 : ~/.config/yabai/focus-space.sh 12
 
 # Send the focused window to workspaces 1-12 and follow it.
 shift + alt - 1 : ~/.config/yabai/send-window-to-space-and-follow.sh 1

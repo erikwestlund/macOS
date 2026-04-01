@@ -18,6 +18,12 @@
   register: brew_casks
   changed_when: false
 
+- name: Gather installed Mac App Store apps
+  ansible.builtin.command: "{{ brew_bin }} exec mas list"
+  register: mas_apps
+  changed_when: false
+  failed_when: false
+
 - name: Gather configured Brew taps
   ansible.builtin.command: "{{ brew_bin }} tap"
   register: brew_taps
@@ -34,49 +40,6 @@
 - name: Tap r-lib/rig
   ansible.builtin.command: "{{ brew_bin }} tap r-lib/rig"
   when: "'r-lib/rig' not in brew_taps.stdout_lines"
-
-- name: Uninstall Homebrew rclone on macOS
-  ansible.builtin.command: "{{ brew_bin }} uninstall rclone"
-  when: "'rclone' in brew_formulae.stdout_lines"
-
-- name: Create temporary directory for rclone install
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: rclone
-  register: rclone_tmpdir
-
-- name: Download upstream rclone archive
-  ansible.builtin.get_url:
-    url: "https://downloads.rclone.org/rclone-current-osx-{{ 'arm64' if ansible_facts.architecture in ['arm64', 'aarch64'] else 'amd64' }}.zip"
-    dest: "{{ rclone_tmpdir.path }}/rclone.zip"
-    mode: "0644"
-
-- name: Unarchive rclone release
-  ansible.builtin.unarchive:
-    src: "{{ rclone_tmpdir.path }}/rclone.zip"
-    dest: "{{ rclone_tmpdir.path }}"
-    remote_src: true
-
-- name: Find extracted rclone binary
-  ansible.builtin.find:
-    paths: "{{ rclone_tmpdir.path }}"
-    patterns: rclone
-    recurse: true
-    file_type: file
-  register: rclone_binary
-
-- name: Install upstream rclone binary
-  become: true
-  ansible.builtin.copy:
-    src: "{{ (rclone_binary.files | map(attribute='path') | reject('search', '/scripts/') | list | first) }}"
-    dest: /usr/local/bin/rclone
-    mode: "0755"
-    remote_src: true
-
-- name: Remove temporary rclone install directory
-  ansible.builtin.file:
-    path: "{{ rclone_tmpdir.path }}"
-    state: absent
 
 - name: Install Brew formulae
   ansible.builtin.command: "{{ brew_bin }} install {{ item }}"
@@ -111,16 +74,15 @@
     - playwright-cli
     - pngquant
     - poppler
-    - quarto
     - qpdf
     - r
+    - rclone
     - neovim
     - redis
     - sketchybar
     - skhd
     - starship
     - syncthing
-    - tailscale-app
     - tailscale
     - tmux
     - unpaper
@@ -134,31 +96,35 @@
     - yabai
   when: item not in brew_formulae.stdout_lines
 
+- name: Refresh sudo timestamp for Homebrew casks
+  become: true
+  ansible.builtin.command: /usr/bin/true
+  changed_when: false
+
 - name: Install Brew casks
-  ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/script
+      - -q
+      - /dev/null
+      - "{{ brew_bin }}"
+      - install
+      - --cask
+      - "{{ item }}"
   loop:
     - bartender
     - bettertouchtool
     - cleanshot
-    - citrix-workspace
     - fastmail
     - geekbench
     - google-chrome
     - iina
-    - logi-options+
-    - mactex
-    - microsoft-excel
-    - microsoft-outlook
-    - microsoft-powerpoint
-    - microsoft-teams
-    - microsoft-word
     - morgen
     - obsidian
     - orbstack
     - plex
     - positron
     - raycast
-    - r-lib/rig/rig
     - rstudio
     - slack
     - sonos
@@ -166,12 +132,55 @@
     - t3-code
     - tableplus
     - transmit
-    - windows-app
     - zed
     - zotero
     - ghostty
-    - zoom
   when: item not in brew_casks.stdout_lines
+
+- name: Install Mac App Store apps
+  ansible.builtin.command: "{{ brew_bin }} exec mas install {{ item.id }}"
+  loop:
+    - { id: '425264550', name: 'Blackmagic Disk Speed Test' }
+    - { id: '1289583905', name: 'Pixelmator Pro' }
+    - { id: '889428659', name: 'xScope 4' }
+  when:
+    - mas_apps.rc == 0
+    - item.id not in mas_apps.stdout
+
+- name: Refresh sudo timestamp for privileged Homebrew casks
+  become: true
+  ansible.builtin.command: /usr/bin/true
+  changed_when: false
+  when: install_privileged_casks | default(false) | bool
+  tags: [privileged_casks]
+
+- name: Install privileged Homebrew casks
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/script
+      - -q
+      - /dev/null
+      - "{{ brew_bin }}"
+      - install
+      - --cask
+      - "{{ item }}"
+  loop:
+    - citrix-workspace
+    - mactex
+    - microsoft-excel
+    - microsoft-outlook
+    - microsoft-powerpoint
+    - microsoft-teams
+    - microsoft-word
+    - quarto
+    - r-lib/rig/rig
+    - tailscale-app
+    - windows-app
+    - zoom
+  when:
+    - install_privileged_casks | default(false) | bool
+    - item not in brew_casks.stdout_lines
+  tags: [privileged_casks]
 
 - name: Ensure ~/.nvm exists
   ansible.builtin.file:
@@ -179,8 +188,21 @@
     state: directory
     mode: "0755"
 
+- name: Refresh sudo timestamp for Homebrew font casks
+  become: true
+  ansible.builtin.command: /usr/bin/true
+  changed_when: false
+
 - name: Install Brew font casks
-  ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/script
+      - -q
+      - /dev/null
+      - "{{ brew_bin }}"
+      - install
+      - --cask
+      - "{{ item }}"
   loop:
     - font-fira-code
     - font-jetbrains-mono

@@ -46,6 +46,12 @@
     state: directory
     mode: "0755"
 
+- name: Ensure ~/Screenshots exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/Screenshots"
+    state: directory
+    mode: "0755"
+
 - name: Ensure ~/.config/yabai exists
   ansible.builtin.file:
     path: "{{ ansible_facts.env.HOME }}/.config/yabai"
@@ -201,6 +207,7 @@
     path: "{{ system_repo }}/config/yabai/{{ item }}"
     mode: "0755"
   loop:
+    - apply-display-config.sh
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
@@ -212,6 +219,8 @@
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
     - focus-or-launch-ivanti.sh
+    - focus-space.sh
+    - focus-or-launch-messages.sh
     - focus-or-launch-music.sh
     - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
@@ -267,6 +276,7 @@
     path: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
     state: absent
   loop:
+    - apply-display-config.sh
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
@@ -278,6 +288,8 @@
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
     - focus-or-launch-ivanti.sh
+    - focus-space.sh
+    - focus-or-launch-messages.sh
     - focus-or-launch-music.sh
     - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
@@ -307,6 +319,7 @@
     dest: "{{ ansible_facts.env.HOME }}/.config/yabai/{{ item }}"
     mode: "0755"
   loop:
+    - apply-display-config.sh
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
@@ -318,6 +331,8 @@
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
     - focus-or-launch-ivanti.sh
+    - focus-space.sh
+    - focus-or-launch-messages.sh
     - focus-or-launch-music.sh
     - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
@@ -402,6 +417,8 @@
     - system_monitor.sh
     - tailscale.sh
     - tmux.sh
+    - weather.sh
+    - workspace_apps.sh
 
 - name: Link ~/.config/sketchybar/sketchybarrc
   ansible.builtin.file:
@@ -426,6 +443,8 @@
     - system_monitor.sh
     - tailscale.sh
     - tmux.sh
+    - weather.sh
+    - workspace_apps.sh
 
 - name: Ensure bordersrc is executable
   ansible.builtin.file:

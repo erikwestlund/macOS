@@ -56,4 +56,4 @@ case "$direction" in
 esac
 
 [ -n "$target_space" ] || exit 0
-/opt/homebrew/bin/yabai -m space --focus "$target_space"
+~/.config/yabai/focus-space.sh "$target_space"

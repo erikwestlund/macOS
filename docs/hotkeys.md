@@ -50,14 +50,18 @@ This file is the current diary of global hotkeys managed in this repo.
 ## Window State
 
 - `Command+Option+N`: toggle focused window between tiled and floating
-- `Command+Option+M`: float, resize, and center the focused window in focus mode
 - `Command+Option+K`: open `~/Vault/Working Memory.md` in a new floating Zed window
 
 ## Utility
 
 - `Command+Option+H`: open the floating fixed-width cheatsheet in Ghostty
-- `Command+Option+J`: focus or launch Ivanti Secure Access
-- `Command+Option+V`: focus or launch Tailscale
+- `Option+Shift+M`: toggle the system monitor popup
+- `Control+Shift+M`: focus or launch `Messages`
+- `Command+Option+T`: toggle the tmux popup
+- `Control+Shift+J`: focus or launch Ivanti Secure Access
+- `Control+Shift+V`: focus or launch Tailscale
+- `Command+Option+W`: toggle the workspace apps popup
+- `Option+Shift+W`: open the `Weather` app
 
 ## Project
 

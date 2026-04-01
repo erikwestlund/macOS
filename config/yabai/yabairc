@@ -1,6 +1,11 @@
 #!/usr/bin/env sh
 
 spaces=14
+machine_scope=
+
+if [ -f "$HOME/.machine" ]; then
+  machine_scope="$(/usr/bin/tr -d '[:space:]' < "$HOME/.machine")"
+fi
 
 # BSP tiling is the closest yabai gets to Hyprland-style automatic tiling.
 /opt/homebrew/bin/yabai -m config layout bsp
@@ -12,6 +17,7 @@ spaces=14
 /opt/homebrew/bin/yabai -m config left_padding 8
 /opt/homebrew/bin/yabai -m config right_padding 8
 /opt/homebrew/bin/yabai -m config window_gap 8
+
 /opt/homebrew/bin/yabai -m config insert_feedback_color 0xff255f67
 /opt/homebrew/bin/yabai -m config mouse_follows_focus off
 /opt/homebrew/bin/yabai -m config focus_follows_mouse off
@@ -27,9 +33,9 @@ spaces=14
 /opt/homebrew/bin/yabai -m rule --remove float-cleanshot 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-finder 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-ivanti 2>/dev/null || true
-/opt/homebrew/bin/yabai -m rule --remove float-messages 2>/dev/null || true
-/opt/homebrew/bin/yabai -m rule --remove float-morgen 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-logi-options 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-tailscale 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-weather 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-zoom 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-settings-titles 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --add label=float-settings app="^Settings$" manage=off
@@ -41,9 +47,9 @@ spaces=14
 /opt/homebrew/bin/yabai -m rule --add label=float-ivanti-access app="^Ivanti Secure Access$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-ivanti app="^Ivanti Secure Access$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-ivanti-client app="^Ivanti Secure Access Client$" manage=off
-/opt/homebrew/bin/yabai -m rule --add label=float-messages app="^Messages$" manage=off
-/opt/homebrew/bin/yabai -m rule --add label=float-morgen app="^Morgen$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-logi-options app="^logioptionsplus$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-tailscale app="^Tailscale$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-weather app="^Weather$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-zoom app="^zoom\.us$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-settings-titles title=".*(Settings|Preferences|Configuration|Config).*" manage=off
 
@@ -55,9 +61,11 @@ spaces=14
 /opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access Client$" manage=off || true
-/opt/homebrew/bin/yabai -m rule --apply app="^Messages$" manage=off || true
-/opt/homebrew/bin/yabai -m rule --apply app="^Morgen$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^logioptionsplus$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Messages$" manage=on || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Morgen$" manage=on || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Tailscale$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Weather$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply title=".*(Settings|Preferences|Configuration|Config).*" manage=off || true
 
 # Ensure a stable set of spaces exists on the primary display.
@@ -67,6 +75,10 @@ while [ "${current_spaces}" -lt "${spaces}" ]; do
   current_spaces=$((current_spaces + 1))
 done
 
-# Reload the scripting addition whenever Dock restarts.
-/opt/homebrew/bin/yabai -m signal --add event=dock_did_restart action="sudo /opt/homebrew/bin/yabai --load-sa"
+# Reload the scripting addition whenever Dock restarts, then re-apply
+# display-specific bar reservation because Dock restart clears it.
+/opt/homebrew/bin/yabai -m signal --add event=dock_did_restart action="sudo /opt/homebrew/bin/yabai --load-sa; $HOME/.config/yabai/apply-display-config.sh"
 sudo /opt/homebrew/bin/yabai --load-sa
+
+# Reserve real top inset for SketchyBar after startup config settles.
+$HOME/.config/yabai/apply-display-config.sh

@@ -5,5 +5,5 @@ current_space=$(/opt/homebrew/bin/yabai -m query --spaces --space | /usr/bin/gre
 if [ "$current_space" = "13" ]; then
   /opt/homebrew/bin/yabai -m space --focus recent
 else
-  /opt/homebrew/bin/yabai -m space --focus 13
+  ~/.config/yabai/focus-space.sh 13
 fi
