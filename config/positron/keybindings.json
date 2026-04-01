@@ -1,0 +1,27 @@
+// Positron keybindings for macOS.
+[
+  // Reassign the default left sidebar toggle from Super+B to Super+A.
+  { "key": "cmd+b", "command": "-workbench.action.toggleSidebarVisibility" },
+  { "key": "cmd+a", "command": "workbench.action.toggleSidebarVisibility" },
+
+  // Use Super+B for the right sidebar.
+  { "key": "cmd+b", "command": "workbench.action.toggleAuxiliaryBar" },
+
+  // Sidebar views.
+  { "key": "alt+cmd+e", "command": "workbench.view.explorer" },
+  { "key": "alt+cmd+x", "command": "workbench.view.extensions" },
+
+  // Focus between editor and terminal.
+  { "key": "cmd+e", "command": "workbench.action.focusActiveEditorGroup" },
+  { "key": "cmd+t", "command": "-workbench.action.showAllSymbols" },
+  { "key": "cmd+t", "command": "workbench.action.terminal.focus" },
+
+  // Navigate editors or terminals depending on focus.
+  { "key": "ctrl+[", "command": "workbench.action.previousEditor", "when": "!terminalFocus" },
+  { "key": "ctrl+]", "command": "workbench.action.nextEditor", "when": "!terminalFocus" },
+  { "key": "ctrl+[", "command": "workbench.action.terminal.focusPrevious", "when": "terminalFocus" },
+  { "key": "ctrl+]", "command": "workbench.action.terminal.focusNext", "when": "terminalFocus" },
+
+  // File navigation.
+  { "key": "cmd+p", "command": "workbench.action.quickOpen" }
+]

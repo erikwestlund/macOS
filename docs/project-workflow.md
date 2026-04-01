@@ -46,7 +46,9 @@ into the project directory.
 
 ## Artifacts
 
-Artifacts are synced over SSH to `syncthing.lan:/srv/Files/Erik/WorkArtifacts/<project>/`.
+Artifacts are synced to the mounted `WorkArtifacts` SMB share at `/Volumes/WorkArtifacts/<project>/` when available.
+
+The legacy SSH path on `syncthing.lan:/srv/Files/Erik/WorkArtifacts/<project>/` is kept as a fallback for older setups.
 
 Rules:
 

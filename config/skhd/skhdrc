@@ -23,6 +23,11 @@ shift + ctrl - v : ~/.config/yabai/focus-or-launch-tailscale.sh
 # Focus or launch Messages.
 shift + ctrl - m : ~/.config/yabai/focus-or-launch-messages.sh
 
+# Restore constant workspace layouts.
+ctrl + alt - 0 : ~/.config/yabai/restore-workspace-layout.sh ws10
+ctrl + alt - 0x1B : ~/.config/yabai/restore-workspace-layout.sh ws11
+ctrl + alt - y : ~/.config/yabai/restore-workspace-layout.sh scratch
+
 # Snap the focused tiled window to a half-screen side.
 shift + alt + cmd - h : ~/.config/yabai/snap-window.sh west
 shift + alt + cmd - j : ~/.config/yabai/snap-window.sh south
@@ -37,6 +42,9 @@ shift + alt + cmd - 0x2F : /opt/homebrew/bin/yabai -m window --resize top:0:-80 
 
 # Toggle the focused window between tiled and floating.
 alt + cmd - n : /opt/homebrew/bin/yabai -m window --toggle float --grid 4:4:1:1:2:2
+
+# Toggle the focused window into Omarchy-style focus mode.
+alt + cmd - m : ~/.config/yabai/focus-mode.sh
 
 # Toggle the system monitor popup.
 shift + alt - m : ~/.config/sketchybar/plugins/system_monitor.sh popup

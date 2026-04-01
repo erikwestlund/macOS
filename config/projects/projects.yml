@@ -1,300 +1,279 @@
-project_root: ~/Projects
-project_manager_root: ~/System/projects
-
+---
+project_root: "~/Projects"
+project_manager_root: "~/System/projects"
 projects:
-  - name: pequod
-    alias: peq
-    type: laravel
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/pequod
-    github_repo: onpequod/pequod
-    required_secrets:
-      - auth.json
-      - .env
-    ports:
-      vite: 5173
-      nginx: 8010
-      postgres: 5440
-      redis: 6390
-      mailpit_smtp: 1030
-      mailpit_web: 8030
-
-  - name: better-shoes
-    alias: bs
-    type: laravel
-    editor: zed
-    docker_compose: true
-    runtime: container
-    path: ~/Projects/better-shoes
-    github_repo: letsrun/better-shoes
-    required_secrets:
-      - .env
-    optional_secrets:
-      - auth.json
-    extras:
-      view_url: http://better-shoes.test
-    ports:
-      vite: 5174
-      nginx: 8020
-      postgres: 5441
-      redis: 6391
-      meilisearch: 7700
-      mailpit_smtp: 1031
-      mailpit_web: 8031
-    bootstrap_commands:
-      - php artisan migrate --force
-
-  - name: framework
-    alias: fw
-    type: rstats
-    editor: positron
-    path: ~/Projects/framework
-    github_repo: table1/framework
-    ports:
-      vite: 5175
-
-  - name: framework-site
-    alias: fws
-    type: laravel
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/framework-site
-    github_repo: table1/framework-site
-    required_secrets:
-      - .env
-    extras:
-      view_url: http://framework-site.test
-    ports:
-      vite: 5176
-      nginx: 8032
-      postgres: 5442
-      redis: 6392
-      minio_api: 9014
-      minio_console: 9015
-      mailpit_smtp: 1032
-      mailpit_web: 8033
-
-  - name: parkukb
-    alias: park
-    type: rstats
-    editor: positron
-    path: ~/Projects/parkukb
-    github_repo: erikwestlund/park-gers
-
-  - name: naaccord-data-depot
-    alias: na
-    type: python
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/naaccord-data-depot
-    github_repo: jhbiostatcenter/naaccord-data-depot
-    required_secrets:
-      - .env
-    extras:
-      view_url: http://naaccord.test
-    architecture_mode: local-build
-    ports:
-      redis: 6393
-      mariadb: 3310
-      web: 8040
-      services: 8041
-      idp: 8082
-      flower: 5555
-    bootstrap_commands:
-      - deploy/containers/mock-idp/generate-certs.sh
-
-  - name: homelab
-    alias: hl
-    type: utility
-    editor: zed
-    path: ~/Projects/homelab
-    github_repo: erikwestlund/homelab
-
-  - name: flint
-    alias: fl
-    type: laravel
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/flint
-    github_repo: erikwestlund/flint
-    required_secrets:
-      - .env
-      - auth.json
-    extras:
-      view_url: http://flint.test
-    ports:
-      vite: 5177
-      nginx: 8031
-      postgres: 5435
-      redis: 6384
-      mailpit_smtp: 1028
-      mailpit_web: 8028
-
-  - name: tnt-syphilis
-    alias: tnt
-    type: rstats
-    editor: positron
-    path: ~/Projects/tnt-syphilis
-    github_repo: erikwestlund/tnt-syphilis
-
-  - name: ohdsi-diabetic-retinopathy-treatment-patterns
-    alias: drtp
-    type: rstats
-    editor: positron
-    path: ~/Projects/ohdsi-diabetic-retinopathy-treatment-patterns
-    github_repo: erikwestlund/ohdsi-diabetic-retinopathy-treatment-patterns
-
-  - name: mh-missing-data
-    alias: mhmi
-    type: rstats
-    editor: positron
-    path: ~/Projects/mh-missing-data
-
-  - name: omarchy
-    alias: om
-    type: utility
-    editor: zed
-    path: ~/Code/System/Omarchy
-
-  - name: r50-code-samples-site
-    alias: r50code
-    type: utility
-    editor: zed
-    path: ~/Projects/r50-code-samples-site
-    github_repo: erikwestlund-nih/code-samples-site
-
-  - name: r50-application
-    alias: r50
-    type: utility
-    editor: zed
-    path: ~/Projects/r50-application
-    github_repo: erikwestlund/r50-app
-
-  - name: geu-legal-gender-recognition
-    alias: geulegal
-    type: rstats
-    editor: positron
-    path: ~/Projects/geu-legal-gender-recognition
-    github_repo: erikwestlund/geu-legal-gender-recognition
-
-  - name: wordle-group
-    alias: wg
-    type: laravel
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/wordle-group
-    github_repo: https://github.com/OnPequod/wordlegroup
-    required_secrets:
-      - .env
-    extras:
-      view_url: http://wordlegroup.test
-    ports:
-      vite: 5178
-      nginx: 8033
-      mysql: 3307
-      redis: 6394
-      mailpit_smtp: 1033
-      mailpit_web: 8034
-
-  - name: web-server-management
-    alias: wsm
-    type: utility
-    editor: zed
-    path: ~/Projects/web-server-management
-    github_repo: OnPequod/web-server-management
-
-  - name: observational-research-methods-in-r
-    alias: obsr
-    type: rstats
-    editor: positron
-    github_repo: erikwestlund/obs-r-26
-    path: ~/Projects/observational-research-methods-in-r
-
-  - name: clinical-data-visualization
-    alias: cdv
-    type: rstats
-    editor: positron
-    path: ~/Projects/clinical-data-visualization
-    github_repo: JHBiostatCenter/clinical-data-viz
-
-  - name: career
-    alias: career
-    type: utility
-    editor: zed
-    github_repo: https://github.com/erikwestlund/career
-    path: ~/Projects/career
-
-  - name: cholera-data-management
-    alias: cholera
-    type: rstats
-    editor: positron
-    github_repo: https://github.com/erikwestlund/cholera-data
-    path: ~/Projects/cholera-data-management
-
-  - name: ai-tools-for-data-science-and-statistics
-    alias: aitools
-    type: rstats
-    editor: positron
-    github_repo: erikwestlund/aitools
-    path: ~/Projects/ai-tools-for-data-science-and-statistics
-
-  - name: letsrun
-    alias: lr
-    type: laravel
-    editor: zed
-    docker_compose: true
-    path: ~/Projects/letsrun
-    github_repo: letsrun/letsrun.com
-    extras:
-      view_url: http://letsrun.test
-      php_version: "8.2"
-      node_version: "13"
-      db_connection: mysql
-      mysql_additional_databases:
-        - letsrun_com
-        - wordpress
-        - db17058c
-    ports:
-      vite: 5179
-      nginx: 8034
-      mysql: 3311
-      redis: 6395
-      minio_api: 9015
-      minio_console: 9016
-      mailpit_smtp: 1025
-      mailpit_web: 8025
-
-  - name: letsrun-forge
-    alias: lrf
-    type: utility
-    editor: zed
-    path: ~/Projects/letsrun-forge
-    github_repo: letsrun/forge
-
-  - name: framework-app
-    alias: fwa
-    type: utility
-    editor: zed
-    path: ~/Projects/framework-app
-
-  - name: cannabis-ehr
-    alias: canehr
-    type: rstats
-    editor: positron
-    path: ~/Projects/cannabis-ehr
-    github_repo: bernaljg/cannabis_ehr
-
-  - name: peanuts
-    alias: peanuts
-    type: rstats
-    editor: positron
-    path: ~/Projects/peanuts
-    github_repo: erikwestlund/peanuts
-
-  - name: mac-system
-    alias: mac
-    type: utility
-    editor: zed
-    github_repo: erikwestlund/system
-    path: ~/System
+- name: pequod
+  alias: peq
+  type: laravel
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/pequod"
+  github_repo: onpequod/pequod
+  required_secrets:
+  - auth.json
+  - ".env"
+  ports:
+    vite: 5173
+    nginx: 8010
+    postgres: 5440
+    redis: 6390
+    mailpit_smtp: 1030
+    mailpit_web: 8030
+- name: better-shoes
+  alias: bs
+  type: laravel
+  editor: zed
+  docker_compose: true
+  runtime: container
+  path: "~/Projects/better-shoes"
+  github_repo: letsrun/better-shoes
+  required_secrets:
+  - ".env"
+  optional_secrets:
+  - auth.json
+  extras:
+    view_url: http://better-shoes.test
+  ports:
+    vite: 5174
+    nginx: 8020
+    postgres: 5441
+    redis: 6391
+    meilisearch: 7700
+    mailpit_smtp: 1031
+    mailpit_web: 8031
+  bootstrap_commands:
+  - php artisan migrate --force
+- name: framework
+  alias: fw
+  type: rstats
+  editor: positron
+  path: "~/Projects/framework"
+  github_repo: table1/framework
+  ports:
+    vite: 5175
+- name: framework-site
+  alias: fws
+  type: laravel
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/framework-site"
+  github_repo: table1/framework-site
+  required_secrets:
+  - ".env"
+  extras:
+    view_url: http://framework-site.test
+  ports:
+    vite: 5176
+    nginx: 8032
+    postgres: 5442
+    redis: 6392
+    minio_api: 9014
+    minio_console: 9015
+    mailpit_smtp: 1032
+    mailpit_web: 8033
+- name: parkukb
+  alias: park
+  type: rstats
+  editor: positron
+  path: "~/Projects/parkukb"
+  github_repo: erikwestlund/park-gers
+- name: naaccord-data-depot
+  alias: na
+  type: python
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/naaccord-data-depot"
+  github_repo: jhbiostatcenter/naaccord-data-depot
+  required_secrets:
+  - ".env"
+  extras:
+    view_url: http://naaccord.test
+  architecture_mode: local-build
+  ports:
+    redis: 6393
+    mariadb: 3310
+    web: 8040
+    services: 8041
+    idp: 8082
+    flower: 5555
+  bootstrap_commands:
+  - deploy/containers/mock-idp/generate-certs.sh
+- name: homelab
+  alias: hl
+  type: utility
+  editor: zed
+  path: "~/Projects/homelab"
+  github_repo: erikwestlund/homelab
+- name: flint
+  alias: fl
+  type: laravel
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/flint"
+  github_repo: erikwestlund/flint
+  required_secrets:
+  - ".env"
+  - auth.json
+  extras:
+    view_url: http://flint.test
+  ports:
+    vite: 5177
+    nginx: 8031
+    postgres: 5435
+    redis: 6384
+    mailpit_smtp: 1028
+    mailpit_web: 8028
+- name: tnt-syphilis
+  alias: tnt
+  type: rstats
+  editor: positron
+  path: "~/Projects/tnt-syphilis"
+  github_repo: erikwestlund/tnt-syphilis
+- name: ohdsi-diabetic-retinopathy-treatment-patterns
+  alias: drtp
+  type: rstats
+  editor: positron
+  path: "~/Projects/ohdsi-diabetic-retinopathy-treatment-patterns"
+  github_repo: erikwestlund/ohdsi-diabetic-retinopathy-treatment-patterns
+- name: mh-missing-data
+  alias: mhmi
+  type: rstats
+  editor: positron
+  path: "~/Projects/mh-missing-data"
+- name: omarchy
+  alias: om
+  type: utility
+  editor: zed
+  path: "~/Code/System/Omarchy"
+- name: r50-code-samples-site
+  alias: r50code
+  type: utility
+  editor: zed
+  path: "~/Projects/r50-code-samples-site"
+  github_repo: erikwestlund-nih/code-samples-site
+- name: r50-application
+  alias: r50
+  type: utility
+  editor: zed
+  path: "~/Projects/r50-application"
+  github_repo: erikwestlund/r50-app
+- name: geu-legal-gender-recognition
+  alias: geulegal
+  type: rstats
+  editor: positron
+  path: "~/Projects/geu-legal-gender-recognition"
+  github_repo: erikwestlund/geu-legal-gender-recognition
+- name: wordle-group
+  alias: wg
+  type: laravel
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/wordle-group"
+  github_repo: https://github.com/OnPequod/wordlegroup
+  required_secrets:
+  - ".env"
+  extras:
+    view_url: http://wordlegroup.test
+  ports:
+    vite: 5178
+    nginx: 8033
+    mysql: 3307
+    redis: 6394
+    mailpit_smtp: 1033
+    mailpit_web: 8034
+- name: web-server-management
+  alias: wsm
+  type: utility
+  editor: zed
+  path: "~/Projects/web-server-management"
+  github_repo: OnPequod/web-server-management
+- name: observational-research-methods-in-r
+  alias: obsr
+  type: rstats
+  editor: positron
+  github_repo: erikwestlund/obs-r-26
+  path: "~/Projects/observational-research-methods-in-r"
+- name: clinical-data-visualization
+  alias: cdv
+  type: rstats
+  editor: positron
+  path: "~/Projects/clinical-data-visualization"
+  github_repo: JHBiostatCenter/clinical-data-viz
+- name: career
+  alias: career
+  type: utility
+  editor: zed
+  github_repo: https://github.com/erikwestlund/career
+  path: "~/Projects/career"
+- name: cholera-data-management
+  alias: cholera
+  type: rstats
+  editor: positron
+  github_repo: https://github.com/erikwestlund/cholera-data
+  path: "~/Projects/cholera-data-management"
+- name: ai-tools-for-data-science-and-statistics
+  alias: aitools
+  type: rstats
+  editor: positron
+  github_repo: erikwestlund/aitools
+  path: "~/Projects/ai-tools-for-data-science-and-statistics"
+- name: letsrun
+  alias: lr
+  type: laravel
+  editor: zed
+  docker_compose: true
+  path: "~/Projects/letsrun"
+  github_repo: letsrun/letsrun.com
+  extras:
+    view_url: http://letsrun.test
+    php_version: '8.2'
+    node_version: '13'
+    db_connection: mysql
+    mysql_additional_databases:
+    - letsrun_com
+    - wordpress
+    - db17058c
+  ports:
+    vite: 5179
+    nginx: 8034
+    mysql: 3311
+    redis: 6395
+    minio_api: 9015
+    minio_console: 9016
+    mailpit_smtp: 1025
+    mailpit_web: 8025
+- name: letsrun-forge
+  alias: lrf
+  type: utility
+  editor: zed
+  path: "~/Projects/letsrun-forge"
+  github_repo: letsrun/forge
+- name: framework-app
+  alias: fwa
+  type: utility
+  editor: zed
+  path: "~/Projects/framework-app"
+- name: cannabis-ehr
+  alias: canehr
+  type: rstats
+  editor: positron
+  path: "~/Projects/cannabis-ehr"
+  github_repo: bernaljg/cannabis_ehr
+- name: peanuts
+  alias: peanuts
+  type: rstats
+  editor: positron
+  path: "~/Projects/peanuts"
+  github_repo: erikwestlund/peanuts
+- name: mac-system
+  alias: mac
+  type: utility
+  editor: zed
+  github_repo: erikwestlund/system
+  path: "~/System"
+- name: lift-icu
+  alias: licu
+  type: rstats
+  editor: positron
+  path: "/Users/erik/Projects/lift-icu"
+  github_repo: erikwestlund/lift-icu

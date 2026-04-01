@@ -112,7 +112,6 @@
       - --cask
       - "{{ item }}"
   loop:
-    - bartender
     - bettertouchtool
     - cleanshot
     - fastmail

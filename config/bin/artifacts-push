@@ -3,8 +3,9 @@
 set -euo pipefail
 
 PROJECTS_DIR="$HOME/Projects"
-REMOTE_HOST="syncthing.lan"
-REMOTE_ROOT="/srv/Files/Erik/WorkArtifacts"
+LOCAL_ROOT="/Volumes/WorkArtifacts"
+LEGACY_REMOTE_HOST="syncthing.lan"
+LEGACY_REMOTE_ROOT="/srv/Files/Erik/WorkArtifacts"
 META="$HOME/.bin/project-meta"
 
 FRAMEWORK_PATTERNS=(
@@ -41,12 +42,11 @@ has_artifacts() {
 
 push_project() {
   local id="$1"
-  local project_name project_dir remote_dir artifacts_file
+  local project_name project_dir remote_dir artifacts_file destination_label
   local rsync_args=()
 
   project_name="$(resolve_project_name "$id")"
   project_dir="$(resolve_project_dir "$id")"
-  remote_dir="$REMOTE_ROOT/$project_name"
   artifacts_file="$project_dir/.artifacts"
 
   if [[ ! -d "$project_dir" ]]; then
@@ -54,9 +54,17 @@ push_project() {
     return 1
   fi
 
+  if [[ -d "$LOCAL_ROOT" ]]; then
+    remote_dir="$LOCAL_ROOT/$project_name"
+    destination_label="$remote_dir/"
+  else
+    remote_dir="$LEGACY_REMOTE_ROOT/$project_name"
+    destination_label="$LEGACY_REMOTE_HOST:$remote_dir/"
+  fi
+
   echo "=== $project_name ==="
   echo "Source: $project_dir"
-  echo "Destination: $REMOTE_HOST:$remote_dir/"
+  echo "Destination: $destination_label"
 
   if [[ -f "$artifacts_file" ]] && [[ -s "$artifacts_file" ]]; then
     echo "Using patterns from .artifacts"
@@ -85,8 +93,13 @@ push_project() {
 
   rsync_args+=(--exclude='*')
 
-  ssh "$REMOTE_HOST" "mkdir -p '$remote_dir'"
-  rsync -az --update --progress "${rsync_args[@]}" "$project_dir/" "$REMOTE_HOST:$remote_dir/"
+  if [[ -d "$LOCAL_ROOT" ]]; then
+    mkdir -p "$remote_dir"
+    rsync -az --update --progress "${rsync_args[@]}" "$project_dir/" "$remote_dir/"
+  else
+    ssh "$LEGACY_REMOTE_HOST" "mkdir -p '$remote_dir'"
+    rsync -az --update --progress "${rsync_args[@]}" "$project_dir/" "$LEGACY_REMOTE_HOST:$remote_dir/"
+  fi
   echo ""
 }
 

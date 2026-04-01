@@ -26,12 +26,12 @@
 |                                | Opt+Sh+W    Weather app       |                                |
 |                                | Opt+Sh+V    Tailscale         |                                |
 |                                |                                |                                |
-| PROJECT PATTERNS               | PROJECT ALIASES               | PROJECT ALIASES                |
-| <alias>        cd repo dir     | aitools bs canehr career      | fwa fws geulegal hl            |
-| pm<alias>      cd pm dir       | cdv cholera drtp fl           | lr lrf mac mhmi na            |
-| tm<alias>      attach tmux     | fw                            | obsr om park peanuts peq       |
-| t<alias>       open tmux term  |                                | r50 r50code tnt wg wsm         |
-| s/b/l/k<alias> setup/bootstrap | pullart<alias> pull artifacts |                                |
-| z/v/p<alias>   editors/view    | pushart<alias> push artifacts |                                |
-| d/dd<alias>    up/down services|                                |                                |
+| PROJECT PATTERNS               | POSITRON                       | PROJECT ALIASES                |
+| <alias>        cd repo dir     | Cmd+A      Toggle left sidebar | aitools bs canehr career       |
+| pm<alias>      cd pm dir       | Cmd+B      Toggle right sidebar| fwa fws geulegal hl            |
+| tm<alias>      attach tmux     | Cmd+Opt+E  File explorer       | lr lrf mac mhmi na             |
+| t<alias>       open tmux term  | Cmd+Opt+X  Extensions          | obsr om park peanuts peq       |
+| s/b/l/k<alias> setup/bootstrap | Cmd+E/T    Focus edit/terminal | r50 r50code tnt wg wsm         |
+| z/v/p<alias>   editors/view    | Ctrl+[/]   Prev/next by focus  |                                |
+| d/dd<alias>    up/down services| Cmd+P      Quick open          |                                |
 +--------------------------------------------------------------------------------------------------+

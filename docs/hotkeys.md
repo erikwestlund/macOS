@@ -50,6 +50,7 @@ This file is the current diary of global hotkeys managed in this repo.
 ## Window State
 
 - `Command+Option+N`: toggle focused window between tiled and floating
+- `Command+Option+M`: toggle focused window into a centered floating layout sized to `1500px x 90%`
 - `Command+Option+K`: open `~/Vault/Working Memory.md` in a new floating Zed window
 
 ## Utility
@@ -60,6 +61,9 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Command+Option+T`: toggle the tmux popup
 - `Control+Shift+J`: focus or launch Ivanti Secure Access
 - `Control+Shift+V`: focus or launch Tailscale
+- `Control+Option+0`: restore workspace `10` layout: Outlook left, Teams right
+- `Control+Option+-`: restore workspace `11` layout: Fastmail left, Morgen right
+- `Control+Option+Y`: restore scratch workspace layout: Messages left, YouTube right
 - `Command+Option+W`: toggle the workspace apps popup
 - `Option+Shift+W`: open the `Weather` app
 

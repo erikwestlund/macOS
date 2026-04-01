@@ -49,8 +49,19 @@ read -r -p "Project path [~/Projects/$project_name]: " project_path
 project_path="${project_path:-$PROJECT_ROOT/$project_name}"
 
 read -r -p "GitHub repo (user/repo or URL, optional): " github_repo
-read -r -p "View URL (optional): " view_url
+view_url=
+if [ "$project_type" = "laravel" ]; then
+  read -r -p "View URL (optional): " view_url
+fi
 
+PROJECT_ALIAS="$project_alias" \
+PROJECT_NAME="$project_name" \
+PROJECT_TYPE="$project_type" \
+PROJECT_EDITOR="$project_editor" \
+PROJECT_DOCKER_COMPOSE="$docker_compose" \
+PROJECT_PATH="$project_path" \
+PROJECT_GITHUB_REPO="$github_repo" \
+PROJECT_VIEW_URL="$view_url" \
 ruby <<RUBY
 require 'yaml'
 config_path = File.expand_path('$CONFIG')
@@ -58,20 +69,20 @@ data = File.exist?(config_path) ? YAML.load_file(config_path) : {}
 data['project_root'] ||= '~/Projects'
 data['project_manager_root'] ||= '~/System/projects'
 data['projects'] ||= []
-if data['projects'].any? { |p| p['alias'] == '$project_alias' || p['name'] == '$project_name' }
+if data['projects'].any? { |p| p['alias'] == ENV['PROJECT_ALIAS'] || p['name'] == ENV['PROJECT_NAME'] }
   abort('Project alias or name already exists')
 end
 project = {
-  'name' => '$project_name',
-  'alias' => '$project_alias',
-  'type' => '$project_type',
-  'editor' => '$project_editor',
-  'docker_compose' => #{docker_compose},
-  'path' => '$project_path'
+  'name' => ENV['PROJECT_NAME'],
+  'alias' => ENV['PROJECT_ALIAS'],
+  'type' => ENV['PROJECT_TYPE'],
+  'editor' => ENV['PROJECT_EDITOR'],
+  'path' => ENV['PROJECT_PATH']
 }
-project['github_repo'] = '$github_repo' unless '$github_repo'.empty?
-unless '$view_url'.empty?
-  project['extras'] = { 'view_url' => '$view_url' }
+project['docker_compose'] = true if ENV['PROJECT_DOCKER_COMPOSE'] == 'true'
+project['github_repo'] = ENV['PROJECT_GITHUB_REPO'] unless ENV['PROJECT_GITHUB_REPO'].empty?
+unless ENV['PROJECT_VIEW_URL'].empty?
+  project['extras'] = { 'view_url' => ENV['PROJECT_VIEW_URL'] }
 end
 data['projects'] << project
 File.write(config_path, data.to_yaml(line_width: -1))

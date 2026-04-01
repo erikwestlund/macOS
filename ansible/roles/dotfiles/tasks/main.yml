@@ -94,6 +94,12 @@
     state: directory
     mode: "0755"
 
+- name: Ensure ~/Library/Application Support/Positron/User exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/Library/Application Support/Positron/User"
+    state: directory
+    mode: "0755"
+
 - name: Ensure ~/.config/sketchybar/plugins exists
   ansible.builtin.file:
     path: "{{ ansible_facts.env.HOME }}/.config/sketchybar/plugins"
@@ -197,6 +203,13 @@
     state: link
     force: true
 
+- name: Link Positron keybindings
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/positron/keybindings.json"
+    dest: "{{ ansible_facts.env.HOME }}/Library/Application Support/Positron/User/keybindings.json"
+    state: link
+    force: true
+
 - name: Ensure yabairc is executable
   ansible.builtin.file:
     path: "{{ system_repo }}/config/yabai/yabairc"
@@ -228,6 +241,7 @@
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
     - focus-or-launch-zoom.sh
+    - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
@@ -297,6 +311,7 @@
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
     - focus-or-launch-zoom.sh
+    - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
@@ -340,6 +355,7 @@
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
     - focus-or-launch-zoom.sh
+    - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
@@ -361,6 +377,7 @@
     - artifacts-pull
     - artifacts-push
     - chrome-new-window
+    - finder-downloads-window
     - finder-new-window
     - focus-or-launch-slack
     - ghostty-cheatsheet
