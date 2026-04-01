@@ -67,6 +67,34 @@ show_popup() {
                   label.padding_left=12 \
                   label.padding_right=12 \
                   width=240
+
+    sketchybar --add item "tmux.session.$index.open" popup."$ITEM_NAME" \
+               --set "tmux.session.$index.open" \
+                  icon.drawing=off \
+                  icon.width=0 \
+                  icon.padding_left=0 \
+                  icon.padding_right=0 \
+                  label="  open" \
+                  label.font="JetBrainsMono Nerd Font:Regular:12.0" \
+                  label.align=left \
+                  label.padding_left=24 \
+                  label.padding_right=12 \
+                  click_script="$PLUGIN_DIR/tmux.sh attach $quoted_session" \
+                  width=240
+
+    sketchybar --add item "tmux.session.$index.kill" popup."$ITEM_NAME" \
+               --set "tmux.session.$index.kill" \
+                  icon.drawing=off \
+                  icon.width=0 \
+                  icon.padding_left=0 \
+                  icon.padding_right=0 \
+                  label="  kill" \
+                  label.font="JetBrainsMono Nerd Font:Regular:12.0" \
+                  label.align=left \
+                  label.padding_left=24 \
+                  label.padding_right=12 \
+                  click_script="$PLUGIN_DIR/tmux.sh kill $quoted_session" \
+                  width=240
   done <<< "$sessions"
 
   sketchybar --set "$ITEM_NAME" popup.drawing=toggle
@@ -80,6 +108,16 @@ attach_session() {
   "$HOME/.bin/ghostty-new-window" "tmux attach-session -t $quoted_session"
 }
 
+kill_session() {
+  local quoted_session
+
+  [[ -n "$SESSION_ARG" ]] || exit 0
+  printf -v quoted_session '%q' "$SESSION_ARG"
+  tmux kill-session -t "$SESSION_ARG" 2>/dev/null || true
+  sketchybar --set "$ITEM_NAME" popup.drawing=off
+  "$PLUGIN_DIR/tmux.sh" update
+}
+
 case "$ACTION" in
   update)
     update_item
@@ -89,5 +127,8 @@ case "$ACTION" in
     ;;
   attach)
     attach_session
+    ;;
+  kill)
+    kill_session
     ;;
 esac

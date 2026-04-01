@@ -1,10 +1,10 @@
-alias ms='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml"'
-alias ms-packages='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags packages'
-alias ms-dotfiles='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags dotfiles'
-alias ms-nas='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags nas'
-alias ms-secrets='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags secrets'
-alias ms-syncthing='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags syncthing'
-alias ms-prefs='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags prefs'
+alias mac-sys='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml"'
+alias mac-packages='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags packages'
+alias mac-dotfiles='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags dotfiles'
+alias mac-nas='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags nas'
+alias mac-secrets='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags secrets'
+alias mac-syncthing='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags syncthing'
+alias mac-prefs='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags prefs'
 
 # SSH
 alias ssh='TERM=xterm-256color ssh'
@@ -44,7 +44,6 @@ alias dt='cd ~/Desktop'
 alias projects='cd ~/Projects'
 alias p='cd ~/Projects'
 alias system='cd ~/System'
-alias msys='cd ~/System'
 
 # Ansible
 alias ap='ansible-playbook'
@@ -69,6 +68,7 @@ alias sudo='sudo '
 
 # Small utilities
 alias week='date +%V'
+alias sso='$HOME/.config/macos/organize-screenshots.sh'
 alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias localip='ipconfig getifaddr en0 || ipconfig getifaddr en1'
 alias map='xargs -n1'

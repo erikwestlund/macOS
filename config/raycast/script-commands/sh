@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+# @raycast.schemaVersion 1
+# @raycast.title sh
+# @raycast.mode compact
+# @raycast.argument1 { "type": "text", "placeholder": "Command" }
+
+# Load zsh environment quietly
+source ~/.zshrc >/dev/null 2>&1
+
+# Ensure persistent history
+HISTFILE=~/.raycast_shell_history
+touch $HISTFILE
+fc -R $HISTFILE
+
+# Save command to history
+print -s "$1"
+fc -W $HISTFILE
+
+# Execute command
+eval "$1"

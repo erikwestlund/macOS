@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-spaces=13
+spaces=14
 
 # BSP tiling is the closest yabai gets to Hyprland-style automatic tiling.
 /opt/homebrew/bin/yabai -m config layout bsp
@@ -20,14 +20,45 @@ spaces=13
 /opt/homebrew/bin/yabai -m config normal_window_opacity 0.90
 
 # Float utility/system apps that work better outside the BSP tree.
-/opt/homebrew/bin/yabai -m rule --add app="^System Settings$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^1Password.*$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^Activity Monitor$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^Finder$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^Ivanti Secure Client$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^Tailscale$" manage=off
-/opt/homebrew/bin/yabai -m rule --add app="^zoom\.us$" manage=off
-/opt/homebrew/bin/yabai -m rule --add title=".*(Settings|Preferences|Configuration|Config).*" manage=off
+/opt/homebrew/bin/yabai -m rule --remove float-settings 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-system-settings 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-1password 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-activity-monitor 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-cleanshot 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-finder 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-ivanti 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-messages 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-morgen 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-tailscale 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-zoom 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-settings-titles 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --add label=float-settings app="^Settings$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-system-settings app="^System Settings$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-1password app="^1Password.*$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-activity-monitor app="^Activity Monitor$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-cleanshot app="^CleanShot X$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-finder app="^Finder$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-ivanti-access app="^Ivanti Secure Access$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-ivanti app="^Ivanti Secure Access$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-ivanti-client app="^Ivanti Secure Access Client$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-messages app="^Messages$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-morgen app="^Morgen$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-tailscale app="^Tailscale$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-zoom app="^zoom\.us$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-settings-titles title=".*(Settings|Preferences|Configuration|Config).*" manage=off
+
+# Re-apply float rules to already-open utility windows when yabai reloads.
+/opt/homebrew/bin/yabai -m rule --apply app="^Settings$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^System Settings$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^1Password.*$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^CleanShot X$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access Client$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Messages$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Morgen$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Tailscale$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply title=".*(Settings|Preferences|Configuration|Config).*" manage=off || true
 
 # Ensure a stable set of spaces exists on the primary display.
 current_spaces=$(/opt/homebrew/bin/yabai -m query --spaces --display 1 | /usr/bin/grep -c '"id"')

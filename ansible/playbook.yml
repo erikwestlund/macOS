@@ -3,6 +3,22 @@
   gather_facts: true
   vars_files:
     - vault/secrets.yml
+  pre_tasks:
+    - name: Check for ~/.machine
+      ansible.builtin.stat:
+        path: "{{ ansible_facts.env.HOME }}/.machine"
+      register: machine_file
+
+    - name: Read ~/.machine
+      ansible.builtin.slurp:
+        src: "{{ ansible_facts.env.HOME }}/.machine"
+      register: machine_file_content
+      when: machine_file.stat.exists
+
+    - name: Set machine scope
+      ansible.builtin.set_fact:
+        machine_scope: "{{ machine_file_content.content | b64decode | trim }}"
+      when: machine_file.stat.exists
   vars:
     borders_bin: /opt/homebrew/bin/borders
     system_repo: "{{ playbook_dir | dirname }}"
@@ -27,3 +43,16 @@
       tags: [syncthing]
     - role: prefs
       tags: [prefs]
+
+  tasks:
+    - name: Apply laptop-only configuration
+      ansible.builtin.include_role:
+        name: laptop
+      when: machine_scope | default('') == 'laptop'
+      tags: [laptop]
+
+    - name: Apply desktop-only configuration
+      ansible.builtin.include_role:
+        name: desktop
+      when: machine_scope | default('') == 'desktop'
+      tags: [desktop]

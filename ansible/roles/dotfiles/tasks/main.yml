@@ -204,19 +204,30 @@
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
+    - snap-window.sh
+    - open-working-memory.sh
+    - focus-mode.sh
     - focus-or-launch-app.sh
     - focus-or-launch-1password.sh
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
+    - focus-or-launch-ivanti.sh
+    - focus-or-launch-music.sh
+    - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
+    - focus-or-launch-spotify.sh
+    - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-zoom.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
     - open-new-ghostty.sh
     - send-window-to-space-and-follow.sh
     - send-to-scratch-space.sh
+    - send-to-utility-space.sh
     - toggle-scratch-space.sh
+    - toggle-utility-space.sh
 
 - name: Ensure secrets helper scripts are executable
   ansible.builtin.file:
@@ -227,6 +238,7 @@
     - artifacts-pull
     - artifacts-push
     - chrome-new-window
+    - finder-downloads-window
     - finder-new-window
     - focus-or-launch-slack
     - ghostty-cheatsheet
@@ -258,19 +270,30 @@
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
+    - snap-window.sh
+    - open-working-memory.sh
+    - focus-mode.sh
     - focus-or-launch-app.sh
     - focus-or-launch-1password.sh
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
+    - focus-or-launch-ivanti.sh
+    - focus-or-launch-music.sh
+    - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
+    - focus-or-launch-spotify.sh
+    - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-zoom.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
     - open-new-ghostty.sh
     - send-window-to-space-and-follow.sh
     - send-to-scratch-space.sh
+    - send-to-utility-space.sh
     - toggle-scratch-space.sh
+    - toggle-utility-space.sh
 
 - name: Copy ~/.config/yabai/yabairc
   ansible.builtin.copy:
@@ -287,19 +310,30 @@
     - open-new-claude.sh
     - open-new-chatgpt.sh
     - open-new-youtube.sh
+    - snap-window.sh
+    - open-working-memory.sh
+    - focus-mode.sh
     - focus-or-launch-app.sh
     - focus-or-launch-1password.sh
     - focus-or-launch-chatgpt.sh
     - focus-or-launch-fastmail.sh
+    - focus-or-launch-ivanti.sh
+    - focus-or-launch-music.sh
+    - focus-or-launch-obsidian.sh
     - focus-or-launch-outlook.sh
+    - focus-or-launch-spotify.sh
+    - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-zoom.sh
     - open-new-chrome.sh
     - focus-active-space.sh
     - focus-absolute-space.sh
     - open-new-ghostty.sh
     - send-window-to-space-and-follow.sh
     - send-to-scratch-space.sh
+    - send-to-utility-space.sh
     - toggle-scratch-space.sh
+    - toggle-utility-space.sh
 
 - name: Link secrets helper scripts
   ansible.builtin.file:
@@ -421,6 +455,7 @@
     mode: "0755"
   loop:
     - archive-downloads-to-nas.sh
+    - organize-screenshots.sh
     - archive-screenshots-to-nas.sh
 
 - name: Link NAS archive scripts
@@ -431,6 +466,7 @@
     force: true
   loop:
     - archive-downloads-to-nas.sh
+    - organize-screenshots.sh
     - archive-screenshots-to-nas.sh
 
 - name: Link keyboard remap LaunchAgent
@@ -447,8 +483,19 @@
     state: link
     force: true
   loop:
+    - com.erik.system.organize-screenshots.plist
     - com.erik.system.archive-downloads-to-nas.plist
     - com.erik.system.archive-screenshots-to-nas.plist
+- name: Check screenshot organizer LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - print
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.organize-screenshots
+  register: screenshot_organizer_agent_status
+  changed_when: false
+  failed_when: false
+
 - name: Check keyboard remap LaunchAgent
   ansible.builtin.command:
     argv:
@@ -488,6 +535,15 @@
       - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.internal-keyboard-remap.plist"
   when: keyboard_remap_agent_status.rc != 0
 
+- name: Load screenshot organizer LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - bootstrap
+      - gui/{{ ansible_facts.user_uid }}
+      - "{{ ansible_facts.env.HOME }}/Library/LaunchAgents/com.erik.system.organize-screenshots.plist"
+  when: screenshot_organizer_agent_status.rc != 0
+
 - name: Load screenshot archive LaunchAgent
   ansible.builtin.command:
     argv:
@@ -513,6 +569,15 @@
       - kickstart
       - -k
       - gui/{{ ansible_facts.user_uid }}/com.erik.system.internal-keyboard-remap
+  changed_when: false
+
+- name: Kickstart screenshot organizer LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - kickstart
+      - -k
+      - gui/{{ ansible_facts.user_uid }}/com.erik.system.organize-screenshots
   changed_when: false
 
 - name: Kickstart screenshot archive LaunchAgent

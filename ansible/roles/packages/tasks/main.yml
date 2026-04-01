@@ -98,10 +98,12 @@
     - imagemagick
     - iperf3
     - jq
+    - lazydocker
     - libpq
     - mas
     - media-control
     - mysql-client
+    - nvm
     - openjdk
     - pandoc
     - php
@@ -151,6 +153,7 @@
     - microsoft-teams
     - microsoft-word
     - morgen
+    - obsidian
     - orbstack
     - plex
     - positron
@@ -170,9 +173,17 @@
     - zoom
   when: item not in brew_casks.stdout_lines
 
+- name: Ensure ~/.nvm exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.nvm"
+    state: directory
+    mode: "0755"
+
 - name: Install Brew font casks
   ansible.builtin.command: "{{ brew_bin }} install --cask {{ item }}"
   loop:
+    - font-fira-code
+    - font-jetbrains-mono
     - font-jetbrains-mono-nerd-font
     - font-symbols-only-nerd-font
   when: item not in brew_casks.stdout_lines

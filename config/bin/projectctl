@@ -24,6 +24,7 @@ ensure_project_loaded() {
   PROJECT_EDITOR="$(project_value '.editor // "zed"')"
   PROJECT_DIR="$(project_value '.path')"
   PROJECT_PM_DIR="$SYSTEM_PROJECTS_DIR/$PROJECT_NAME"
+  PROJECT_NODE_VERSION="$(project_value '.extras.node_version // ""')"
   PROJECT_VIEW_URL="$(project_value '.extras.view_url // ""')"
   PROJECT_DOCKER_COMPOSE="$(project_value '.docker_compose // false')"
   PROJECT_RUNTIME="$(project_value '.runtime // "container"')"
@@ -39,6 +40,25 @@ ensure_path_exists() {
     echo "Project path does not exist: $PROJECT_DIR" >&2
     exit 1
   fi
+}
+
+ensure_project_nvmrc() {
+  [ -f "$PROJECT_DIR/package.json" ] || return 0
+  [ -n "$PROJECT_NODE_VERSION" ] || return 0
+  [ -f "$PROJECT_DIR/.nvmrc" ] && return 0
+  printf '%s\n' "$PROJECT_NODE_VERSION" > "$PROJECT_DIR/.nvmrc"
+}
+
+node_shell_command() {
+  local command="$1"
+  printf '%s' "export NVM_DIR=\"\$HOME/.nvm\"; if [ -s \"/opt/homebrew/opt/nvm/nvm.sh\" ]; then . \"/opt/homebrew/opt/nvm/nvm.sh\"; elif [ -s \"\$HOME/.nvm/nvm.sh\" ]; then . \"\$HOME/.nvm/nvm.sh\"; fi; if command -v nvm >/dev/null 2>&1 && [ -f .nvmrc ]; then nvm install >/dev/null; nvm use >/dev/null; fi; $command"
+}
+
+run_project_node_command() {
+  local command="$1"
+  [ -f "$PROJECT_DIR/package.json" ] || return 0
+  ensure_project_nvmrc
+  (cd "$PROJECT_DIR" && bash -lc "$(node_shell_command "$command")")
 }
 
 deploy_project_secrets() {
@@ -310,6 +330,7 @@ EOF
 bootstrap_laravel() {
   ensure_laravel_runtime_dirs
   ensure_docker_data_dir
+  ensure_project_nvmrc
   if [ "$PROJECT_NAME" = "better-shoes" ]; then
     generate_better_shoes_compose
     if [ -x "$HOME/.bin/ghcr-login" ]; then
@@ -326,25 +347,23 @@ bootstrap_laravel() {
     (cd "$PROJECT_DIR" && $(compose_cmd) up -d)
     (cd "$PROJECT_DIR" && $(compose_cmd) exec -T php composer install --no-interaction --prefer-dist --optimize-autoloader)
   fi
-  if [ "$PROJECT_RUNTIME" != "herd" ] && [ -f "$PROJECT_DIR/package.json" ]; then
-    (cd "$PROJECT_DIR" && $(compose_cmd) exec -T php npm install)
-  fi
+  run_project_node_command "npm install"
 }
 
 bootstrap_python() {
   ensure_docker_data_dir
+  ensure_project_nvmrc
   if [ "$PROJECT_NAME" = "naaccord-data-depot" ] && [ "$PROJECT_ARCH_MODE" = "local-build" ]; then
     generate_naaccord_local_override
   fi
   if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
     (cd "$PROJECT_DIR" && $(compose_cmd) build)
   fi
-  if [ -f "$PROJECT_DIR/package.json" ]; then
-    (cd "$PROJECT_DIR" && npm install)
-  fi
+  run_project_node_command "npm install"
 }
 
 bootstrap_rstats() {
+  ensure_project_nvmrc
   if [ -f "$PROJECT_DIR/DESCRIPTION" ]; then
     (cd "$PROJECT_DIR" && Rscript -e "dir.create(Sys.getenv('R_LIBS_USER'), recursive = TRUE, showWarnings = FALSE); for (pkg in c('devtools','remotes')) { if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg, repos = 'https://cloud.r-project.org', lib = Sys.getenv('R_LIBS_USER')) }; devtools::install_deps()") || true
     if [ "$PROJECT_NAME" = "framework" ]; then
@@ -354,9 +373,7 @@ bootstrap_rstats() {
   if [ -f "$PROJECT_DIR/renv.lock" ]; then
     (cd "$PROJECT_DIR" && Rscript -e 'if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv", repos = "https://cloud.r-project.org"); renv::restore(prompt = FALSE)') || true
   fi
-  if [ -f "$PROJECT_DIR/package.json" ]; then
-    (cd "$PROJECT_DIR" && npm install)
-  fi
+  run_project_node_command "npm install"
 }
 
 run_bootstrap_commands() {
@@ -375,6 +392,7 @@ setup_project() {
   deploy_project_secrets
   copy_required_secrets
   copy_optional_secrets
+  ensure_project_nvmrc
   ensure_docker_data_dir
 
   if [ "$PROJECT_TYPE" = "laravel" ]; then
@@ -402,39 +420,41 @@ ensure_tmux_session() {
     return 0
   fi
 
-  tmux new-session -d -s "$PROJECT_ALIAS" -n bash -c "$PROJECT_DIR"
+  mkdir -p "$PROJECT_PM_DIR"
+
+  tmux new-session -d -s "$PROJECT_ALIAS" -n zsh -c "$PROJECT_DIR"
   tmux new-window -t "$PROJECT_ALIAS":2 -n opencode-1 -c "$PROJECT_DIR"
-  tmux send-keys -t "$PROJECT_ALIAS":2 "tmux-opencode" C-m
+  tmux send-keys -t "$PROJECT_ALIAS":2 "tmux-opencode"
   tmux new-window -t "$PROJECT_ALIAS":3 -n opencode-2 -c "$PROJECT_DIR"
-  tmux send-keys -t "$PROJECT_ALIAS":3 "tmux-opencode" C-m
+  tmux send-keys -t "$PROJECT_ALIAS":3 "tmux-opencode"
   tmux new-window -t "$PROJECT_ALIAS":4 -n claude-1 -c "$PROJECT_DIR"
-  tmux send-keys -t "$PROJECT_ALIAS":4 "tmux-claude" C-m
+  tmux send-keys -t "$PROJECT_ALIAS":4 "tmux-claude"
   tmux new-window -t "$PROJECT_ALIAS":5 -n claude-2 -c "$PROJECT_DIR"
-  tmux send-keys -t "$PROJECT_ALIAS":5 "tmux-claude" C-m
+  tmux send-keys -t "$PROJECT_ALIAS":5 "tmux-claude"
 
   case "$PROJECT_TYPE" in
     laravel)
       tmux new-window -t "$PROJECT_ALIAS":6 -n docker -c "$PROJECT_DIR"
       tmux send-keys -t "$PROJECT_ALIAS":6 "docker compose up" C-m
       tmux new-window -t "$PROJECT_ALIAS":7 -n npm -c "$PROJECT_DIR"
-      tmux send-keys -t "$PROJECT_ALIAS":7 "[ -f package.json ] && npm run dev" C-m
+      tmux send-keys -t "$PROJECT_ALIAS":7 "$(node_shell_command "[ -f package.json ] && npm run dev")" C-m
       tmux new-window -t "$PROJECT_ALIAS":8 -n artisan -c "$PROJECT_DIR"
-      tmux new-window -t "$PROJECT_ALIAS":9 -n project -c "$PROJECT_DIR"
+      tmux new-window -t "$PROJECT_ALIAS":9 -n project -c "$PROJECT_PM_DIR"
       ;;
     python)
       tmux new-window -t "$PROJECT_ALIAS":6 -n python -c "$PROJECT_DIR"
       tmux send-keys -t "$PROJECT_ALIAS":6 "[ -d .venv ] && source .venv/bin/activate; python3" C-m
-      tmux new-window -t "$PROJECT_ALIAS":7 -n project -c "$PROJECT_DIR"
+      tmux new-window -t "$PROJECT_ALIAS":7 -n project -c "$PROJECT_PM_DIR"
       ;;
     rstats)
       tmux new-window -t "$PROJECT_ALIAS":6 -n R -c "$PROJECT_DIR"
       tmux send-keys -t "$PROJECT_ALIAS":6 "R" C-m
       tmux new-window -t "$PROJECT_ALIAS":7 -n python -c "$PROJECT_DIR"
       tmux send-keys -t "$PROJECT_ALIAS":7 "[ -d .venv ] && source .venv/bin/activate; python3" C-m
-      tmux new-window -t "$PROJECT_ALIAS":8 -n project -c "$PROJECT_DIR"
+      tmux new-window -t "$PROJECT_ALIAS":8 -n project -c "$PROJECT_PM_DIR"
       ;;
     *)
-      tmux new-window -t "$PROJECT_ALIAS":6 -n project -c "$PROJECT_DIR"
+      tmux new-window -t "$PROJECT_ALIAS":6 -n project -c "$PROJECT_PM_DIR"
       ;;
   esac
 

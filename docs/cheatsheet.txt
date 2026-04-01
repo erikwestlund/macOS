@@ -1,0 +1,32 @@
++--------------------------------------------------------------------------------------------------+
+| HOTKEYS, UTILS, AND PROJECTS                                                       Cmd+Opt+H closes |
++--------------------------------+--------------------------------+--------------------------------+
+| WINDOWS                        | APPS                           | SPACES / SYSTEM                |
+| Opt+H/J/K/L    Focus           | Cmd+Sh+A    New ChatGPT       | Opt+1..0,-,= Focus 1..12       |
+| Opt+Sh+H/K/L   Move            | Cmd+Sh+K    New Claude        | Opt+Left/Right Prev/next abs   |
+| Cmd+Opt+Sh+H/J/K/L Snap half   | Cmd+Sh+B    New Chrome        | Opt+[ / ]     Prev/next active |
+| Opt+Sh+,/.     Wider/Narrower  | Cmd+Sh+Y    New YouTube       | Opt+Sh+1..=   Send and follow  |
+| Cmd+Opt+Sh+,/. Taller/Shorter  | Opt+Enter   New Ghostty       | Cmd+Opt+Sh+1..= Send no follow |
+| Cmd+Opt+N      Float / tile    | Cmd+Sh+M    Floating btop     | Opt+Y / Sh+Y Scratch toggle/send|
+| Cmd+Opt+M      Focus mode      | Cmd+Sh+D    Lazydocker        | mac-sys       Full playbook    |
+| Cmd+Opt+K      Working Memory  | Cmd+Sh+F    Finder            | mac-packages  Packages only    |
+| Opt+Sh+J       JHU VPN         | Opt+Sh+V   Tailscale          | mac-dotfiles  Dotfiles only    |
+| Opt+` / Sh+`   Utility toggle/send| Cmd+Opt+D Downloads         | mac-prefs     Prefs only       |
+|                                | Cmd+Opt+H   Cheatsheet        |                                |
+| APPS (FOCUS / LAUNCH)          | UTILS / SCRIPTS               | mac-secrets   Secrets only     |
+| Cmd+Sh+E    Fastmail           | pm-new       New project      | mac-nas       NAS only         |
+| Cmd+Sh+R    Slack              | sso          Organize shots    | mac-syncthing Syncthing only   |
+| Cmd+Sh+S    Spotify            | secrets-pull Pull secrets     | secrets-setup Bootstrap secrets|
+| Cmd+Sh+N    Obsidian           | secrets-push Push secrets     | vault-view    Vault browser    |
+| Cmd+Sh+O    Outlook            | add-task     Task helper       | na-arm64      NA images        |
+| Cmd+Sh+T    Teams              | projectctl    Project CLI      | reload        Reload shell     |
+| Cmd+Sh+Z    Zoom               |                               |                                |
+| PROJECT PATTERNS               | PROJECT ALIASES               | PROJECT ALIASES                |
+| <alias>      cd repo dir       | aitools bs canehr career      | fwa fws geulegal hl            |
+| pm<alias>    cd pm dir         | cdv cholera drtp fl           | lr lrf mac mhmi na            |
+| tm<alias>    attach tmux       | fw                            | obsr om park peanuts peq       |
+| t<alias>     open tmux term    |                                | r50 r50code tnt wg wsm         |
+| s/b/l/k<alias> setup/bootstrap | pullart<alias> pull artifacts |                                |
+| z/v/p<alias> editors/view      | pushart<alias> push artifacts |                                |
+| d/dd<alias>  up/down services  |                                |                                |
++--------------------------------------------------------------------------------------------------+

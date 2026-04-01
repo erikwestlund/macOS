@@ -35,21 +35,26 @@ Secrets are required for a working setup on a new machine.
 secrets-pull
 
 # Re-deploy secrets-backed files into their final locations
-ms-secrets
+mac-secrets
 ```
 
 ## Notes
 
 - Dotfiles and system configuration live in `~/System`.
-- Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `ms-secrets` deploys them into final locations.
+- Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `mac-secrets` deploys them into final locations.
 - `rclone` is installed from the upstream release by Ansible on macOS instead of Homebrew.
 - macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
+- Shell aliases in `config/shell/aliases` include the Omarchy Git and Docker shortcuts, while project-scoped aliases like `d{alias}` and `dd{alias}` are generated dynamically from `config/projects/projects.yml` by `project-meta`.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
 - `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
 - NAS credentials are managed via the `nas` role in `/etc/nsmb.conf` so Finder and SMB mounts can authenticate without prompts.
 - Local `.test` development domains are managed via the `localdev` role using `dnsmasq` and `caddy` on macOS through root LaunchDaemons.
-- Launchd jobs archive `~/Screenshots` and move `~/Downloads` entries older than 7 days directly over SSH to `syncthing.lan:/srv/Files/Erik/...`.
+- Machine-scoped Ansible roles are supported through `~/.machine`: if that file exists and contains exactly `laptop` or `desktop`, the matching scoped role runs after the shared roles; if the file is absent, neither scoped role runs.
+- The SketchyBar tmux popup lists each session with indented `open` and `kill` actions; `open` launches a new Ghostty window attached to that session and `kill` terminates only that tmux session.
+- A daily Launchd job organizes `~/Screenshots` into `month/day` folders using each file's creation date, and `sso` runs that organizer on demand.
+- The screenshot archive job runs the organizer first, then rsyncs new screenshots to `syncthing.lan:/srv/Files/Erik/Screenshots` while preserving the organized folder structure.
+- Launchd jobs archive organized screenshots and move `~/Downloads` entries older than 7 days to `syncthing.lan:/srv/Files/Erik/...`.
 - Syncthing is managed via the `syncthing` role and currently syncs `~/Docs` and `~/Work` to the existing Syncthing server profile from Omarchy.
 - Yabai is installed by Ansible and copies tracked files from `config/yabai` into `~/.config/yabai`.
 - Borders is installed by Ansible and uses a tracked `config/borders/bordersrc` under `~/.config/borders` for focused window borders.

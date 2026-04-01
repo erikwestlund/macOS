@@ -209,5 +209,5 @@ What to move:
 1. Run `secrets-setup` and `secrets-pull` with the real R2 credentials.
 2. Move or sync existing private SSH keys into `~/.secrets/ssh`.
 3. Add any needed secret payloads under `~/.secrets/git`, `~/.secrets/aws`, and `~/.secrets/rclone`.
-4. Run `ms-secrets` again after secrets land locally.
+4. Run `mac-secrets` again after secrets land locally.
 5. Decide whether to fully symlink `~/.ssh` to `~/.secrets/ssh` once the local migration is complete.

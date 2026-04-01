@@ -17,6 +17,8 @@ This repository should serve as a reference for needs on this machine, but the m
 
 The README should provide declarative context. Try not to be redundant with this repository. REAMDE.md is the source of truth; this file tells the system how to work.
 
+Keep `README.md` current when repository behavior changes. In particular, document alias coverage inherited from Omarchy and machine-scoped Ansible behavior such as `~/.machine` driving `laptop` and `desktop` roles.
+
 ## Symlinks
 
 Where it is *not* fragile, we should symlink config in this repository. However, if symlinks are fragile we should prefer copying over files. An inventory of which should be kept in the README.md.
@@ -37,10 +39,12 @@ Do not use . prefixes in this repository.
 
 Aliases are used to speed up common tasks. An ~/.aliases file is ingested by zsh.
 
-The main ansible playbook which runs everyhing should have an alias of "ms".  This is equivalent to "om" in the Omarchy repository.
+Project-scoped aliases are also generated dynamically from `config/projects/projects.yml` via `project-meta`, including `d{alias}` and `dd{alias}` for Docker Compose.
+
+The main ansible playbook which runs everything should have an alias of "mac-sys". This is equivalent to "om" in the Omarchy repository.
 
 Common ansible runs should be aliased, using commands like:
 
-- ms-packages: Run ansible role to install all packages.
-- ms-dotfiles: Run ansible role to install all dotfiles.
-- ms-prefs: Run ansible to configur default macOS preferences not covered by dotfiles.
+- mac-packages: Run ansible role to install all packages.
+- mac-dotfiles: Run ansible role to install all dotfiles.
+- mac-prefs: Run ansible to configure default macOS preferences not covered by dotfiles.

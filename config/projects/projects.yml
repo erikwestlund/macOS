@@ -291,3 +291,10 @@ projects:
     editor: positron
     path: ~/Projects/peanuts
     github_repo: erikwestlund/peanuts
+
+  - name: mac-system
+    alias: mac
+    type: utility
+    editor: zed
+    github_repo: erikwestlund/system
+    path: ~/System

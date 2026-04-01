@@ -8,9 +8,22 @@ alt - l : /opt/homebrew/bin/yabai -m window --focus east || /opt/homebrew/bin/ya
 
 # Move windows around inside the current BSP tree.
 shift + alt - h : /opt/homebrew/bin/yabai -m window --warp west
-shift + alt - j : /opt/homebrew/bin/yabai -m window --warp south
+
+# Focus or launch Ivanti Secure Access.
+shift + alt - j : ~/.config/yabai/focus-or-launch-ivanti.sh
+
+# Move windows around inside the current BSP tree.
 shift + alt - k : /opt/homebrew/bin/yabai -m window --warp north
 shift + alt - l : /opt/homebrew/bin/yabai -m window --warp east
+
+# Focus or launch Tailscale.
+shift + alt - v : ~/.config/yabai/focus-or-launch-tailscale.sh
+
+# Snap the focused tiled window to a half-screen side.
+shift + alt + cmd - h : ~/.config/yabai/snap-window.sh west
+shift + alt + cmd - j : ~/.config/yabai/snap-window.sh south
+shift + alt + cmd - k : ~/.config/yabai/snap-window.sh north
+shift + alt + cmd - l : ~/.config/yabai/snap-window.sh east
 
 # Resize the focused window.
 shift + alt - 0x2B : /opt/homebrew/bin/yabai -m window --resize left:80:0 || /opt/homebrew/bin/yabai -m window --resize right:-80:0
@@ -21,17 +34,32 @@ shift + alt + cmd - 0x2F : /opt/homebrew/bin/yabai -m window --resize top:0:-80 
 # Toggle the focused window between tiled and floating.
 alt + cmd - n : /opt/homebrew/bin/yabai -m window --toggle float --grid 4:4:1:1:2:2
 
+# Toggle Omarchy-style focus mode while preserving the current frame.
+alt + cmd - m : ~/.config/yabai/focus-mode.sh
+
 # Always open a new Ghostty window on the current workspace.
 alt - return : ~/.config/yabai/open-new-ghostty.sh
 
 # Open a new Ghostty window running btop.
 shift + cmd - m : ~/.bin/ghostty-btop
 
+# Open a new Ghostty window running lazydocker.
+shift + cmd - d : ~/.bin/ghostty-new-window "lazydocker"
+
+# Focus or launch Apple Music.
+shift + alt + cmd - m : ~/.config/yabai/focus-or-launch-music.sh
+
 # Open a new Finder window.
 shift + cmd - f : ~/.bin/finder-new-window
 
+# Open a new Finder window to Downloads.
+alt + cmd - d : ~/.bin/finder-downloads-window
+
 # Focus or launch Fastmail.
 shift + cmd - e : ~/.config/yabai/focus-or-launch-fastmail.sh
+
+# Focus or launch Obsidian.
+shift + cmd - n : ~/.config/yabai/focus-or-launch-obsidian.sh
 
 # Temporarily disabled to allow 1Password's native global shortcut.
 # shift + cmd - p : ~/.config/yabai/focus-or-launch-1password.sh
@@ -39,14 +67,20 @@ shift + cmd - e : ~/.config/yabai/focus-or-launch-fastmail.sh
 # Focus or launch Slack.
 shift + cmd - r : ~/.bin/focus-or-launch-slack
 
+# Focus or launch Spotify.
+shift + cmd - s : ~/.config/yabai/focus-or-launch-spotify.sh
+
 # Open the hotkey cheatsheet in Ghostty.
 alt + cmd - h : ~/.bin/ghostty-cheatsheet
+
+# Open Working Memory in a new floating Zed window.
+alt + cmd - k : ~/.config/yabai/open-working-memory.sh
 
 # Always open a new Claude web app window on the current workspace.
 shift + cmd - k : ~/.config/yabai/open-new-claude.sh
 
-# Focus or launch the ChatGPT app.
-shift + cmd - a : ~/.config/yabai/focus-or-launch-chatgpt.sh
+# Always open a new ChatGPT web app window on the current workspace.
+shift + cmd - a : ~/.config/yabai/open-new-chatgpt.sh
 
 # Always open a new Google Chrome window on the current workspace.
 shift + cmd - b : ~/.config/yabai/open-new-chrome.sh
@@ -59,6 +93,9 @@ shift + cmd - o : ~/.config/yabai/focus-or-launch-outlook.sh
 
 # Focus or launch Microsoft Teams.
 shift + cmd - t : ~/.config/yabai/focus-or-launch-teams.sh
+
+# Focus or launch Zoom.
+shift + cmd - z : ~/.config/yabai/focus-or-launch-zoom.sh
 
 # Focus absolute previous/next spaces with wraparound.
 alt - left : ~/.config/yabai/focus-absolute-space.sh prev
@@ -73,6 +110,12 @@ alt - 0x10 : ~/.config/yabai/toggle-scratch-space.sh
 
 # Send the focused window to the scratch workspace.
 shift + alt - 0x10 : ~/.config/yabai/send-to-scratch-space.sh
+
+# Toggle a hidden utility workspace on space 14.
+alt - 0x32 : ~/.config/yabai/toggle-utility-space.sh
+
+# Send the focused window to the utility workspace.
+shift + alt - 0x32 : ~/.config/yabai/send-to-utility-space.sh
 
 # Focus workspaces 1-12 with Option+1-0,-,=
 alt - 1 : /opt/homebrew/bin/yabai -m space --focus 1
