@@ -49,6 +49,7 @@
     - awscli
     - borders
     - btop
+    - cmake
     - composer
     - caddy
     - dnsmasq

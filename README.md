@@ -51,6 +51,7 @@ mac-secrets
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `mac-secrets` deploys them into final locations.
 - `rclone` is installed from Homebrew and its config is linked from `~/.secrets/rclone` when present.
+- `cmake` is installed from Homebrew as part of the base packages role so R packages with native build steps can compile without a manual one-off install.
 - Privileged Homebrew casks are not installed on the first run. Once the main bootstrap has created `/private/etc/sudoers.d/<user>`, later `mac-sys` runs include them automatically. Use `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` or `mac-apps-privileged` if you want to install them immediately after bootstrap.
 - `UniFi Identity Endpoint` is managed as a privileged Homebrew cask, so it installs automatically on later `mac-sys` runs or during that immediate `install_privileged_casks=true` follow-up run.
 - Mac App Store apps are installed through `mas` from the packages role when the user is signed into the App Store; the current managed set includes `Blackmagic Disk Speed Test`, `Pixelmator Pro`, and `xScope 4`.
