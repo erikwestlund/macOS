@@ -6,7 +6,7 @@ This file is the current diary of global hotkeys managed in this repo.
 
 - `Option+Enter`: always open a new `Ghostty` window on the current workspace
 - `Command+Shift+M`: open a centered floating `Ghostty` window running `btop`
-- `Command+Shift+D`: open a new `Ghostty` window running `lazydocker`
+- `Control+Shift+D`: open a new `Ghostty` window running `lazydocker`
 - `Command+Option+Shift+M`: focus or launch `Music`
 - `Command+Shift+F`: open a new Finder window
 - `Command+Option+D`: open a new Finder window to `~/Downloads`
@@ -66,6 +66,7 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Control+Option+Y`: restore scratch workspace layout: Messages left, YouTube right
 - `Option+Shift+W`: toggle the workspace apps popup
 - `Command+Option+W`: open the `Weather` app
+- `Control+Command+I`: toggle Dictation in the frontmost app when that app exposes the standard `Edit` menu item
 
 ## Project
 

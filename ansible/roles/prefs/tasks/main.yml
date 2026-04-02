@@ -106,6 +106,52 @@
   changed_when: false
   failed_when: false
 
+- name: Enable SSH launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl enable system/com.openssh.sshd
+  changed_when: false
+
+- name: Check SSH launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl print system/com.openssh.sshd
+  register: ssh_service
+  changed_when: false
+  failed_when: false
+
+- name: Bootstrap SSH launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl bootstrap system /System/Library/LaunchDaemons/ssh.plist
+  when: ssh_service.rc != 0
+  changed_when: false
+
+- name: Start SSH launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl kickstart -k system/com.openssh.sshd
+  changed_when: false
+
+- name: Enable Screen Sharing launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl enable system/com.apple.screensharing
+  changed_when: false
+
+- name: Check Screen Sharing launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl print system/com.apple.screensharing
+  register: screensharing_service
+  changed_when: false
+  failed_when: false
+
+- name: Bootstrap Screen Sharing launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.screensharing.plist
+  when: screensharing_service.rc != 0
+  changed_when: false
+
+- name: Start Screen Sharing launch service
+  become: true
+  ansible.builtin.command: /bin/launchctl kickstart -k system/com.apple.screensharing
+  changed_when: false
+
 - name: Check for duti
   ansible.builtin.stat:
     path: /opt/homebrew/bin/duti

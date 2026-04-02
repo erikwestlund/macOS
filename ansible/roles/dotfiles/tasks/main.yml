@@ -276,6 +276,7 @@
     - secrets-pull
     - secrets-push
     - secrets-setup
+    - toggle-dictation
     - tmux-claude
     - tmux-opencode
     - vault-view
@@ -392,6 +393,7 @@
     - secrets-pull
     - secrets-push
     - secrets-setup
+    - toggle-dictation
     - tmux-claude
     - tmux-opencode
     - vault-view

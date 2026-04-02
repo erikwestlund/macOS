@@ -14,5 +14,7 @@ localdev_sites:
     port: 8032
   - domain: wordlegroup.test
     port: 8033
+  - domain: letsrun.test
+    port: 8034
   - domain: naaccord.test
     port: 8040

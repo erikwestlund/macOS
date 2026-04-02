@@ -131,6 +131,53 @@ ensure_laravel_runtime_dirs() {
     "$PROJECT_DIR/storage/framework/views"
 }
 
+set_env_value() {
+  local file="$1"
+  local key="$2"
+  local value="$3"
+
+  [ -f "$file" ] || return 0
+
+  if /usr/bin/grep -q "^${key}=" "$file"; then
+    /usr/bin/perl -0pi -e "s/^\Q${key}\E=.*/${key}=${value}/m" "$file"
+  else
+    printf '%s=%s\n' "$key" "$value" >> "$file"
+  fi
+}
+
+normalize_letsrun_env() {
+  local env_file="$PROJECT_DIR/.env"
+
+  [ "$PROJECT_NAME" = "letsrun" ] || return 0
+  [ -f "$env_file" ] || return 0
+
+  set_env_value "$env_file" "DB_HOST_READ" "mysql"
+  set_env_value "$env_file" "DB_HOST_WRITE" "mysql"
+  set_env_value "$env_file" "DB_HOST_READ_REPLICA" "mysql"
+  set_env_value "$env_file" "DB_USERNAME" "letsrun"
+  set_env_value "$env_file" "DB_PASSWORD" "letsrun-dev-secret"
+  set_env_value "$env_file" "DB_PASSWORD_READ" "letsrun-dev-secret"
+  set_env_value "$env_file" "DB_PASSWORD_WRITE" "letsrun-dev-secret"
+  set_env_value "$env_file" "DB_PASSWORD_READ_REPLICA" "letsrun-dev-secret"
+  set_env_value "$env_file" "LRC_LEGACY_DB_HOST" "mysql"
+  set_env_value "$env_file" "LRC_LEGACY_DB_USERNAME" "letsrun"
+  set_env_value "$env_file" "LRC_LEGACY_DB_PASSWORD" "letsrun-dev-secret"
+  set_env_value "$env_file" "LRC_WORDPRESS_DB_HOST" "mysql"
+  set_env_value "$env_file" "LRC_WORDPRESS_DB_USERNAME" "letsrun"
+  set_env_value "$env_file" "LRC_WORDPRESS_DB_PASSWORD" "letsrun-dev-secret"
+  set_env_value "$env_file" "REDIS_HOST" "redis"
+  set_env_value "$env_file" "CACHE_REDIS_HOST" "redis"
+  set_env_value "$env_file" "CACHE_REDIS_HOST_PRIMARY" "redis"
+  set_env_value "$env_file" "CACHE_REDIS_HOST_SECONDARY" "redis"
+  set_env_value "$env_file" "CACHE_REDIS_DB" "1"
+  set_env_value "$env_file" "SESSION_REDIS_HOST" "redis"
+  set_env_value "$env_file" "SESSION_REDIS_DB" "2"
+  set_env_value "$env_file" "QUEUE_REDIS_HOST" "redis"
+  set_env_value "$env_file" "QUEUE_REDIS_DB" "3"
+  set_env_value "$env_file" "MAIL_HOST" "mailpit"
+  set_env_value "$env_file" "MAIL_PORT" "1025"
+}
+
 generate_naaccord_local_override() {
   cat > "$PROJECT_DIR/docker-compose.local.yml" <<'EOF'
 services:
@@ -392,6 +439,7 @@ setup_project() {
   deploy_project_secrets
   copy_required_secrets
   copy_optional_secrets
+  normalize_letsrun_env
   ensure_project_nvmrc
   ensure_docker_data_dir
 

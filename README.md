@@ -51,16 +51,19 @@ mac-secrets
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `mac-secrets` deploys them into final locations.
 - `rclone` is installed from Homebrew and its config is linked from `~/.secrets/rclone` when present.
-- Privileged Homebrew casks are not installed on the first run; install them with `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` after the main bootstrap has enabled passwordless sudo.
+- Privileged Homebrew casks are not installed on the first run; install them with `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` or the `mac-apps-privileged` alias after the main bootstrap has enabled passwordless sudo.
+- `UniFi Identity Endpoint` is managed as a privileged Homebrew cask, so it installs during that second `install_privileged_casks=true` packages run.
 - Mac App Store apps are installed through `mas` from the packages role when the user is signed into the App Store; the current managed set includes `Blackmagic Disk Speed Test`, `Pixelmator Pro`, and `xScope 4`.
 - macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
 - Positron keybindings are tracked in `config/positron/keybindings.json` and linked to `~/Library/Application Support/Positron/User/keybindings.json`.
 - Shell aliases in `config/shell/aliases` include the Omarchy Git and Docker shortcuts, `mac-pull`/`mac-push` for updating this repo, `mac-save` for committing it with the standard message `update mac system configuration`, and project-scoped aliases like `d{alias}` and `dd{alias}` generated dynamically from `config/projects/projects.yml` by `project-meta`.
+- Shell functions in `config/shell/aliases` also provide Docker-aware `php`, `composer`, and `art`: when the current directory is inside a project with `docker-compose.yml` and a matching `<project>-php` container, they run inside that container at the corresponding `/var/www/html/...` working directory; otherwise they fall back to the local command.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
 - `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
 - NAS credentials are managed via the `nas` role in `/etc/nsmb.conf` so Finder and SMB mounts can authenticate without prompts.
 - The `prefs` Ansible role manages Finder defaults including Column View and showing all filename extensions.
+- The `prefs` Ansible role also enables macOS `Remote Login` (SSH) and `Screen Sharing` on both laptop and desktop setups.
 - Project artifacts live on the NAS `WorkArtifacts` SMB share and are expected at `/Volumes/WorkArtifacts` when mounted locally; artifact scripts prefer that mounted share and only fall back to the older `syncthing.lan` SSH path for legacy setups.
 - Local `.test` development domains are managed via the `localdev` role using `dnsmasq` and `caddy` on macOS through root LaunchDaemons.
 - Machine-scoped Ansible roles are supported through `~/.machine`: if that file exists and contains exactly `laptop` or `desktop`, the matching scoped role runs after the shared roles; if the file is absent, neither scoped role runs.
@@ -84,3 +87,4 @@ mac-secrets
 - Ansible manages passwordless sudo for the local user via `/private/etc/sudoers.d/<user>`; the first apply still requires an authenticated sudo run.
 - macOS still requires Accessibility permission for `skhd` and window manager permissions for `yabai` in System Settings.
 - Chrome web apps are created manually, then customized from this repo. Create web apps for `Claude`, `ChatGPT`, and `YouTube`, then wire them into managed launchers and icons here.
+- The `localdev` role currently routes `academic.test`, `app.academic.test`, `flint.test`, `better-shoes.test`, `framework-site.test`, `wordlegroup.test`, `letsrun.test`, and `naaccord.test` to their local Docker ports.

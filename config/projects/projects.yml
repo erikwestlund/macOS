@@ -224,10 +224,14 @@ projects:
   docker_compose: true
   path: "~/Projects/letsrun"
   github_repo: letsrun/letsrun.com
+  required_secrets:
+  - ".env"
+  - auth.json
+  - ".npmrc"
   extras:
     view_url: http://letsrun.test
     php_version: '8.2'
-    node_version: '13'
+    node_version: '20'
     db_connection: mysql
     mysql_additional_databases:
     - letsrun_com

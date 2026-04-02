@@ -1,5 +1,6 @@
 alias mac-sys='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml"'
 alias mac-packages='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags packages'
+alias mac-apps-privileged='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags packages -e install_privileged_casks=true'
 alias mac-dotfiles='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags dotfiles'
 alias mac-nas='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags nas'
 alias mac-secrets='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags secrets'
@@ -144,6 +145,67 @@ alias dls='docker container ls'
 alias dlsa='docker container ls -a'
 alias dclean='docker system prune -f'
 alias dcleanall='docker system prune -a -f'
+
+# Laravel/PHP docker wrappers.
+_php_project_root() {
+  local dir="$PWD"
+
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/docker-compose.yml" ]]; then
+      printf '%s\n' "$dir"
+      return 0
+    fi
+
+    dir="$(dirname "$dir")"
+  done
+
+  return 1
+}
+
+_php_container() {
+  local root="$1"
+  local container
+
+  [[ -n "$root" ]] || return 1
+  container="$(basename "$root")-php"
+  docker container inspect "$container" >/dev/null 2>&1 || return 1
+  printf '%s\n' "$container"
+}
+
+_docker_php_exec() {
+  local root container rel workdir
+  local -a docker_flags
+
+  root="$(_php_project_root)" || return 1
+  container="$(_php_container "$root")" || return 1
+
+  rel="${PWD#$root}"
+  rel="${rel#/}"
+  workdir="/var/www/html"
+
+  if [[ -n "$rel" ]]; then
+    workdir="$workdir/$rel"
+  fi
+
+  docker_flags=(-i)
+  if [[ -t 0 && -t 1 ]]; then
+    docker_flags=(-it)
+  fi
+
+  docker exec ${docker_flags[@]} -w "$workdir" "$container" "$@"
+}
+
+php() {
+  _docker_php_exec php "$@" || command php "$@"
+}
+
+art() {
+  _docker_php_exec php artisan "$@" || command php artisan "$@"
+}
+
+composer() {
+  _docker_php_exec composer "$@" || command composer "$@"
+}
 
 # Tmux and editors
 alias tmnew='tmux new -s'
