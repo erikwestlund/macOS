@@ -59,8 +59,8 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Option+Shift+M`: toggle the system monitor popup
 - `Control+Shift+M`: focus or launch `Messages`
 - `Option+Shift+T`: toggle the tmux popup
-- `Control+Shift+J`: focus or launch Ivanti Secure Access
-- `Control+Shift+V`: focus or launch Tailscale
+- `Control+Option+J`: focus or launch Ivanti Secure Access
+- `Control+Option+V`: focus or launch Tailscale
 - `Control+Option+0`: restore workspace `10` layout: Outlook left, Teams right
 - `Control+Option+-`: restore workspace `11` layout: Fastmail left, Morgen right
 - `Control+Option+Y`: restore scratch workspace layout: Messages left, YouTube right

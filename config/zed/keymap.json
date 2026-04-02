@@ -10,12 +10,19 @@
     "bindings": {
       "super-t": "terminal_panel::Toggle",
       "super-e": "workspace::ToggleLeftDock",
-    },
+    }
   },
   {
     "context": "Editor && vim_mode == insert",
     "bindings": {
       // "j k": "vim::NormalBefore"
-    },
+    }
   },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-shift-j": ["workspace::DecreaseActiveDockSize", { "px": 0 }],
+      "ctrl-shift-k": ["workspace::IncreaseActiveDockSize", { "px": 0 }]
+    }
+  }
 ]

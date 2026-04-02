@@ -56,10 +56,11 @@ mac-secrets
 - macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
 - Positron keybindings are tracked in `config/positron/keybindings.json` and linked to `~/Library/Application Support/Positron/User/keybindings.json`.
-- Shell aliases in `config/shell/aliases` include the Omarchy Git and Docker shortcuts, while project-scoped aliases like `d{alias}` and `dd{alias}` are generated dynamically from `config/projects/projects.yml` by `project-meta`.
+- Shell aliases in `config/shell/aliases` include the Omarchy Git and Docker shortcuts, `mac-pull`/`mac-push` for updating this repo, `mac-save` for committing it with the standard message `update mac system configuration`, and project-scoped aliases like `d{alias}` and `dd{alias}` generated dynamically from `config/projects/projects.yml` by `project-meta`.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
 - `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
 - NAS credentials are managed via the `nas` role in `/etc/nsmb.conf` so Finder and SMB mounts can authenticate without prompts.
+- The `prefs` Ansible role manages Finder defaults including Column View and showing all filename extensions.
 - Project artifacts live on the NAS `WorkArtifacts` SMB share and are expected at `/Volumes/WorkArtifacts` when mounted locally; artifact scripts prefer that mounted share and only fall back to the older `syncthing.lan` SSH path for legacy setups.
 - Local `.test` development domains are managed via the `localdev` role using `dnsmasq` and `caddy` on macOS through root LaunchDaemons.
 - Machine-scoped Ansible roles are supported through `~/.machine`: if that file exists and contains exactly `laptop` or `desktop`, the matching scoped role runs after the shared roles; if the file is absent, neither scoped role runs.

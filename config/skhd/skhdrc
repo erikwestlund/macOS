@@ -11,14 +11,14 @@ shift + alt - h : /opt/homebrew/bin/yabai -m window --warp west
 shift + alt - j : /opt/homebrew/bin/yabai -m window --warp south
 
 # Focus or launch Ivanti Secure Access.
-shift + ctrl - j : ~/.config/yabai/focus-or-launch-ivanti.sh
+ctrl + alt - j : ~/.config/yabai/focus-or-launch-ivanti.sh
 
 # Move windows around inside the current BSP tree.
 shift + alt - k : /opt/homebrew/bin/yabai -m window --warp north
 shift + alt - l : /opt/homebrew/bin/yabai -m window --warp east
 
 # Focus or launch Tailscale.
-shift + ctrl - v : ~/.config/yabai/focus-or-launch-tailscale.sh
+ctrl + alt - v : ~/.config/yabai/focus-or-launch-tailscale.sh
 
 # Focus or launch Messages.
 shift + ctrl - m : ~/.config/yabai/focus-or-launch-messages.sh

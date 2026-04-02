@@ -5,6 +5,9 @@ alias mac-nas='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playboo
 alias mac-secrets='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags secrets'
 alias mac-syncthing='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags syncthing'
 alias mac-prefs='ANSIBLE_CONFIG="$HOME/System/ansible/ansible.cfg" ansible-playbook "$HOME/System/ansible/playbook.yml" --tags prefs'
+alias mac-pull='git -C "$HOME/System" pull'
+alias mac-push='git -C "$HOME/System" push'
+alias mac-save='git -C "$HOME/System" add -A && git -C "$HOME/System" commit -m "update mac system configuration"'
 
 # SSH
 alias ssh='TERM=xterm-256color ssh'

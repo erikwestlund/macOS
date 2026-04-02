@@ -42,6 +42,21 @@
   ansible.builtin.command: killall Finder
   when: set_finder_view_style is defined and set_finder_view_style is changed
 
+- name: Read Finder show-all-extensions preference
+  ansible.builtin.command: defaults read NSGlobalDomain AppleShowAllExtensions
+  register: finder_show_all_extensions
+  changed_when: false
+  failed_when: false
+
+- name: Show all filename extensions in Finder
+  ansible.builtin.command: defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+  register: set_finder_show_all_extensions
+  when: finder_show_all_extensions.stdout != "1"
+
+- name: Restart Finder after filename extension preference change
+  ansible.builtin.command: killall Finder
+  when: set_finder_show_all_extensions is defined and set_finder_show_all_extensions is changed
+
 - name: Read trackpad tap-to-click preference
   ansible.builtin.command: defaults read com.apple.AppleMultitouchTrackpad Clicking
   register: trackpad_tap_to_click

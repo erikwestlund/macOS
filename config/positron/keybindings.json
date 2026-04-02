@@ -22,6 +22,10 @@
   { "key": "ctrl+[", "command": "workbench.action.terminal.focusPrevious", "when": "terminalFocus" },
   { "key": "ctrl+]", "command": "workbench.action.terminal.focusNext", "when": "terminalFocus" },
 
+  // Resize the active terminal pane Omarchy-style.
+  { "key": "ctrl+shift+j", "command": "workbench.action.terminal.resizePaneUp" },
+  { "key": "ctrl+shift+k", "command": "workbench.action.terminal.resizePaneDown" },
+
   // File navigation.
   { "key": "cmd+p", "command": "workbench.action.quickOpen" }
 ]

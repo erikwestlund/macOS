@@ -26,8 +26,8 @@
 |                                | Opt+Sh+W    Workspace popup   |                                |
 |                                | Cmd+Opt+W   Weather app       |                                |
 |                                | Ctrl+Sh+M   Messages          |                                |
-|                                | Ctrl+Sh+J   Ivanti            |                                |
-|                                | Ctrl+Sh+V   Tailscale         |                                |
+|                                | Ctrl+Opt+J  Ivanti            |                                |
+|                                | Ctrl+Opt+V  Tailscale         |                                |
 |                                |                                |                                |
 | PROJECT PATTERNS               | POSITRON                       | PROJECT ALIASES                |
 | <alias>        cd repo dir     | Cmd+A      Toggle left sidebar | aitools bs canehr career       |
