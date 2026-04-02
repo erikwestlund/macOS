@@ -26,8 +26,10 @@ For a project alias like `na`:
 - `pna`: open project in Positron
 - `dna`: `docker compose up -d`
 - `ddna`: `docker compose down`
+- `tpna`: open the project's local database in TablePlus
 - `pullartna`: pull project artifacts into the repo
 - `pushartna`: push project artifacts from the repo
+- `projectctl tableplus na`: open the project's local database in TablePlus
 - `na`: cd to project code directory
 - `pmna`: cd to project management directory under `~/System/projects`
 
@@ -96,6 +98,8 @@ exec zsh
 
 - `s{alias}`: clone repo if needed, create management dir, deploy secrets, and run light setup only
 - `b{alias}`: run setup plus heavier build/bootstrap work
+
+For database-backed projects, `b{alias}` also syncs the local TablePlus connection by opening the derived local DSN in TablePlus after bootstrap completes.
 
 Examples:
 

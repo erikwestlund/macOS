@@ -29,10 +29,109 @@ ensure_project_loaded() {
   PROJECT_DOCKER_COMPOSE="$(project_value '.docker_compose // false')"
   PROJECT_RUNTIME="$(project_value '.runtime // "container"')"
   PROJECT_ARCH_MODE="$(project_value '.architecture_mode // "default"')"
-  PROJECT_GITHUB_REPO="$(project_value '.github_repo // ""')"
-  PROJECT_REQUIRED_SECRETS="$(project_value '.required_secrets // [] | join("\n")')"
-  PROJECT_OPTIONAL_SECRETS="$(project_value '.optional_secrets // [] | join("\n")')"
-  PROJECT_BOOTSTRAP_COMMANDS="$(project_value '.bootstrap_commands // [] | join("\n")')"
+PROJECT_GITHUB_REPO="$(project_value '.github_repo // ""')"
+PROJECT_REQUIRED_SECRETS="$(project_value '.required_secrets // [] | join("\n")')"
+PROJECT_OPTIONAL_SECRETS="$(project_value '.optional_secrets // [] | join("\n")')"
+PROJECT_BOOTSTRAP_COMMANDS="$(project_value '.bootstrap_commands // [] | join("\n")')"
+}
+
+env_value() {
+  local file="$1"
+  local key="$2"
+
+  [ -f "$file" ] || return 0
+  /usr/bin/perl -ne 'if (/^\Q'$key'\E=(.*)$/) { print "$1\n"; exit 0 }' "$file"
+}
+
+project_port_value() {
+  local key="$1"
+  project_value ".ports.${key} // empty"
+}
+
+urlencode() {
+  /usr/bin/ruby -ruri -e 'print URI.encode_www_form_component(ARGV[0].to_s)' "$1"
+}
+
+tableplus_is_installed() {
+  [ -d "/Applications/TablePlus.app" ]
+}
+
+tableplus_sync_project() {
+  local env_file="$PROJECT_DIR/.env"
+  local connection database username password service internal_port host_port scheme
+  local additional_databases database_name dsn
+
+  tableplus_is_installed || return 0
+  [ -f "$env_file" ] || return 0
+
+  connection="$(env_value "$env_file" "DB_CONNECTION")"
+  database="$(env_value "$env_file" "DB_DATABASE")"
+  username="$(env_value "$env_file" "DB_USERNAME")"
+  password="$(env_value "$env_file" "DB_PASSWORD")"
+
+  if [ -z "$connection" ] && [ "$PROJECT_NAME" = "naaccord-data-depot" ]; then
+    connection="mariadb"
+    database="$(env_value "$env_file" "DB_NAME")"
+    username="$(env_value "$env_file" "DB_USER")"
+    password="$(env_value "$PROJECT_DIR/.env.docker-saml" "DB_PASSWORD")"
+  fi
+
+  case "$connection" in
+    pgsql|postgres|postgresql)
+      scheme="postgresql"
+      service="postgres"
+      internal_port="5432"
+      ;;
+    mysql)
+      scheme="mysql"
+      service="mysql"
+      internal_port="3306"
+      ;;
+    mariadb)
+      scheme="mariadb"
+      service="mariadb"
+      internal_port="3306"
+      ;;
+    sqlite|'')
+      return 0
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  [ -n "$database" ] || return 0
+  [ -n "$username" ] || return 0
+
+  host_port=""
+  if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
+    host_port="$(cd "$PROJECT_DIR" && $(compose_cmd) port "$service" "$internal_port" 2>/dev/null | /usr/bin/perl -ne 'if (/:(\d+)$/) { print "$1\n"; exit 0 }')"
+  fi
+
+  if [ -z "$host_port" ]; then
+    case "$service" in
+      postgres) host_port="$(project_port_value postgres)" ;;
+      mysql) host_port="$(project_port_value mysql)" ;;
+      mariadb) host_port="$(project_port_value mariadb)" ;;
+    esac
+  fi
+
+  [ -n "$host_port" ] || return 0
+
+  additional_databases="$database"
+  if [ "$PROJECT_NAME" = "letsrun" ]; then
+    additional_databases="$(printf '%s\n' "$database"; project_value '.extras.mysql_additional_databases // [] | .[]')"
+  fi
+
+  while IFS= read -r database_name; do
+    [ -n "$database_name" ] || continue
+    dsn="${scheme}://$(urlencode "$username")"
+    if [ -n "$password" ]; then
+      dsn="${dsn}:$(urlencode "$password")"
+    fi
+    dsn="${dsn}@127.0.0.1:${host_port}/$(urlencode "$database_name")"
+    /usr/bin/open -a TablePlus "$dsn"
+  done <<< "$additional_databases"
 }
 
 ensure_path_exists() {
@@ -554,6 +653,7 @@ case "$cmd" in
       docker exec naaccord-test-web python manage.py load_test_users
     fi
     run_bootstrap_commands
+    tableplus_sync_project
     if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
       true
     fi
@@ -628,8 +728,13 @@ case "$cmd" in
       deploy_project_secrets
     fi
     ;;
+  tableplus)
+    ensure_project_loaded
+    setup_project
+    tableplus_sync_project
+    ;;
   *)
-    echo "usage: projectctl <setup|bootstrap|launch|kill|tmux|term|zed|positron|view|up|down|deploy-secrets> <alias>" >&2
+    echo "usage: projectctl <setup|bootstrap|launch|kill|tmux|term|zed|positron|view|up|down|deploy-secrets|tableplus> <alias>" >&2
     exit 1
     ;;
 esac

@@ -1,11 +1,11 @@
 // Positron keybindings for macOS.
 [
-  // Reassign the default left sidebar toggle from Super+B to Super+A.
+  // Reassign the default left sidebar toggle from Super+B to Super+Option+A.
   { "key": "cmd+b", "command": "-workbench.action.toggleSidebarVisibility" },
-  { "key": "cmd+a", "command": "workbench.action.toggleSidebarVisibility" },
+  { "key": "cmd+alt+a", "command": "workbench.action.toggleSidebarVisibility" },
 
-  // Use Super+B for the right sidebar.
-  { "key": "cmd+b", "command": "workbench.action.toggleAuxiliaryBar" },
+  // Use Super+Option+B to close the right sidebar.
+  { "key": "cmd+alt+b", "command": "workbench.action.closeAuxiliaryBar" },
 
   // Sidebar views.
   { "key": "alt+cmd+e", "command": "workbench.view.explorer" },

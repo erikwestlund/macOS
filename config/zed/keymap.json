@@ -9,7 +9,9 @@
   {
     "bindings": {
       "super-t": "terminal_panel::Toggle",
-      "super-e": "workspace::ToggleLeftDock",
+      "alt-super-a": "workspace::ToggleLeftDock",
+      "super-e": "workspace::FocusCenterPane",
+      "alt-super-b": "workspace::ToggleRightDock"
     }
   },
   {
