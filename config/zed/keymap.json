@@ -21,8 +21,8 @@
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-shift-j": ["workspace::DecreaseActiveDockSize", { "px": 0 }],
-      "ctrl-shift-k": ["workspace::IncreaseActiveDockSize", { "px": 0 }]
+      "ctrl-shift-j": ["workspace::IncreaseActiveDockSize", { "px": 0 }],
+      "ctrl-shift-k": ["workspace::DecreaseActiveDockSize", { "px": 0 }]
     }
   }
 ]
