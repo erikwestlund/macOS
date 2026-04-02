@@ -99,7 +99,7 @@ exec zsh
 - `s{alias}`: clone repo if needed, create management dir, deploy secrets, and run light setup only
 - `b{alias}`: run setup plus heavier build/bootstrap work
 
-For database-backed projects, `b{alias}` also syncs the local TablePlus connection by opening the derived local DSN in TablePlus after bootstrap completes.
+For database-backed projects, use `tp{alias}` or `projectctl tableplus <alias>` to open the derived local DSN in TablePlus when needed.
 
 Examples:
 

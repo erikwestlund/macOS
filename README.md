@@ -23,11 +23,11 @@ chmod 600 ~/.vault_pass
 # First run: install formulae, standard casks, dotfiles, secrets, prefs, and passwordless sudo
 ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/playbook.yml -K
 
-# Second run: install privileged pkg/script-backed casks after passwordless sudo is in place
+# Optional immediate follow-up: install privileged pkg/script-backed casks right away
 ANSIBLE_CONFIG=~/System/ansible/ansible.cfg ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true
 ```
 
-The first playbook run is also the secrets bootstrap. This repo already includes the encrypted `ansible/vault/secrets.yml` file, so unlike Omarchy there is no separate manual `rclone copy ...` bootstrap step to fetch it first. Ansible reads that vault file, writes `~/.config/secrets/config`, and runs `secrets-pull`, which syncs encrypted secrets from Backblaze B2 into `~/.secrets` before secrets-backed roles are applied. Privileged Homebrew casks that invoke macOS pkg or vendor installers are deferred to the second command so the initial bootstrap can complete reliably before they run.
+The first playbook run is also the secrets bootstrap. This repo already includes the encrypted `ansible/vault/secrets.yml` file, so unlike Omarchy there is no separate manual `rclone copy ...` bootstrap step to fetch it first. Ansible reads that vault file, writes `~/.config/secrets/config`, and runs `secrets-pull`, which syncs encrypted secrets from Backblaze B2 into `~/.secrets` before secrets-backed roles are applied. Privileged Homebrew casks that invoke macOS pkg or vendor installers are skipped until the repo-managed passwordless sudo file exists; after that, regular `mac-sys` runs install them automatically. The second command remains available if you want to run that packages step immediately after bootstrap.
 
 ## Secrets
 
@@ -51,15 +51,15 @@ mac-secrets
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `mac-secrets` deploys them into final locations.
 - `rclone` is installed from Homebrew and its config is linked from `~/.secrets/rclone` when present.
-- Privileged Homebrew casks are not installed on the first run; install them with `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` or the `mac-apps-privileged` alias after the main bootstrap has enabled passwordless sudo.
-- `UniFi Identity Endpoint` is managed as a privileged Homebrew cask, so it installs during that second `install_privileged_casks=true` packages run.
+- Privileged Homebrew casks are not installed on the first run. Once the main bootstrap has created `/private/etc/sudoers.d/<user>`, later `mac-sys` runs include them automatically. Use `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` or `mac-apps-privileged` if you want to install them immediately after bootstrap.
+- `UniFi Identity Endpoint` is managed as a privileged Homebrew cask, so it installs automatically on later `mac-sys` runs or during that immediate `install_privileged_casks=true` follow-up run.
 - Mac App Store apps are installed through `mas` from the packages role when the user is signed into the App Store; the current managed set includes `Blackmagic Disk Speed Test`, `Pixelmator Pro`, and `xScope 4`.
 - macOS-specific tracked files live under `config/macos`.
 - Git is tracked in `config/git/gitconfig` and linked to `~/.gitconfig`.
 - Positron keybindings are tracked in `config/positron/keybindings.json` and linked to `~/Library/Application Support/Positron/User/keybindings.json`.
 - Shell aliases in `config/shell/aliases` include the Omarchy Git and Docker shortcuts, `mac-pull`/`mac-push` for updating this repo, `mac-save` for committing it with the standard message `update mac system configuration`, and project-scoped aliases like `d{alias}` and `dd{alias}` generated dynamically from `config/projects/projects.yml` by `project-meta`.
 - Shell functions in `config/shell/aliases` also provide Docker-aware `php`, `composer`, and `art`: when the current directory is inside a project with `docker-compose.yml` and a matching `<project>-php` container, they run inside that container at the corresponding `/var/www/html/...` working directory; otherwise they fall back to the local command.
-- `projectctl bootstrap <alias>` also opens the project's local PostgreSQL, MySQL, or MariaDB connection in TablePlus when the project exposes enough local env and port metadata to derive a supported DSN.
+- `projectctl tableplus <alias>` opens the project's local PostgreSQL, MySQL, or MariaDB connection in TablePlus when the project exposes enough local env and port metadata to derive a supported DSN.
 - SSH config is tracked in `config/ssh/config`; private SSH material is expected under `~/.secrets/ssh`.
 - `/etc/hosts` can be deployed from `~/.secrets/hosts` via the `secrets` Ansible role.
 - NAS credentials are managed via the `nas` role in `/etc/nsmb.conf` so Finder and SMB mounts can authenticate without prompts.

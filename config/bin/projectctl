@@ -653,7 +653,6 @@ case "$cmd" in
       docker exec naaccord-test-web python manage.py load_test_users
     fi
     run_bootstrap_commands
-    tableplus_sync_project
     if [ "$PROJECT_DOCKER_COMPOSE" = "true" ] && [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
       true
     fi

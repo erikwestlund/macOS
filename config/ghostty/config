@@ -5,8 +5,8 @@ window-padding-balance = true
 copy-on-select = true
 
 # Split management
-keybind = super+d=new_split:right
-keybind = super+shift+d=new_split:down
+keybind = super+d=new_split:down
+keybind = super+shift+d=new_split:right
 keybind = ctrl+super+h=goto_split:left
 keybind = ctrl+super+j=goto_split:down
 keybind = ctrl+super+k=goto_split:up
