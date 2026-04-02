@@ -4,17 +4,17 @@
   { "key": "cmd+b", "command": "-workbench.action.toggleSidebarVisibility" },
   { "key": "cmd+alt+a", "command": "workbench.action.toggleSidebarVisibility" },
 
-  // Use Super+Option+B to close the right sidebar.
-  { "key": "cmd+alt+b", "command": "workbench.action.closeAuxiliaryBar" },
+  // Use Super+Option+B to toggle the right sidebar.
+  { "key": "cmd+alt+b", "command": "workbench.action.toggleAuxiliaryBar" },
 
   // Sidebar views.
   { "key": "alt+cmd+e", "command": "workbench.view.explorer" },
   { "key": "alt+cmd+x", "command": "workbench.view.extensions" },
 
-  // Focus between editor and terminal.
+  // Focus the editor and toggle the bottom panel.
   { "key": "cmd+e", "command": "workbench.action.focusActiveEditorGroup" },
   { "key": "cmd+t", "command": "-workbench.action.showAllSymbols" },
-  { "key": "cmd+t", "command": "workbench.action.terminal.focus" },
+  { "key": "cmd+t", "command": "workbench.action.togglePanel" },
 
   // Navigate editors or terminals depending on focus.
   { "key": "ctrl+[", "command": "workbench.action.previousEditor", "when": "!terminalFocus" },

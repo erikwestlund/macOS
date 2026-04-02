@@ -56,12 +56,11 @@ tableplus_is_installed() {
   [ -d "/Applications/TablePlus.app" ]
 }
 
-tableplus_sync_project() {
+tableplus_project_dsn() {
   local env_file="$PROJECT_DIR/.env"
   local connection database username password service internal_port host_port scheme
-  local additional_databases database_name dsn
+  local preferred_database dsn
 
-  tableplus_is_installed || return 0
   [ -f "$env_file" ] || return 0
 
   connection="$(env_value "$env_file" "DB_CONNECTION")"
@@ -118,20 +117,26 @@ tableplus_sync_project() {
 
   [ -n "$host_port" ] || return 0
 
-  additional_databases="$database"
-  if [ "$PROJECT_NAME" = "letsrun" ]; then
-    additional_databases="$(printf '%s\n' "$database"; project_value '.extras.mysql_additional_databases // [] | .[]')"
+  preferred_database="$(project_value '.extras.tableplus_database // empty')"
+  if [ -n "$preferred_database" ]; then
+    database="$preferred_database"
   fi
 
-  while IFS= read -r database_name; do
-    [ -n "$database_name" ] || continue
-    dsn="${scheme}://$(urlencode "$username")"
-    if [ -n "$password" ]; then
-      dsn="${dsn}:$(urlencode "$password")"
-    fi
-    dsn="${dsn}@127.0.0.1:${host_port}/$(urlencode "$database_name")"
-    /usr/bin/open -a TablePlus "$dsn"
-  done <<< "$additional_databases"
+  dsn="${scheme}://$(urlencode "$username")"
+  if [ -n "$password" ]; then
+    dsn="${dsn}:$(urlencode "$password")"
+  fi
+  dsn="${dsn}@127.0.0.1:${host_port}/$(urlencode "$database")"
+  printf '%s\n' "$dsn"
+}
+
+tableplus_sync_project() {
+  local dsn
+
+  tableplus_is_installed || return 0
+  dsn="$(tableplus_project_dsn)"
+  [ -n "$dsn" ] || return 0
+  /usr/bin/open -a TablePlus "$dsn"
 }
 
 ensure_path_exists() {
@@ -732,8 +737,13 @@ case "$cmd" in
     setup_project
     tableplus_sync_project
     ;;
+  tableplus-url)
+    ensure_project_loaded
+    setup_project
+    tableplus_project_dsn
+    ;;
   *)
-    echo "usage: projectctl <setup|bootstrap|launch|kill|tmux|term|zed|positron|view|up|down|deploy-secrets|tableplus> <alias>" >&2
+    echo "usage: projectctl <setup|bootstrap|launch|kill|tmux|term|zed|positron|view|up|down|deploy-secrets|tableplus|tableplus-url> <alias>" >&2
     exit 1
     ;;
 esac

@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "renv.lock": "json"
+  },
+  "workbench.colorTheme": "Monokai Pro (Filter Octagon)",
+  "workbench.iconTheme": "catppuccin-mocha",
+  "editor.fontFamily": "JetBrains Mono",
+  "terminal.integrated.fontFamily": "JetBrains Mono",
+  "terminal.integrated.fontSize": 14
+}

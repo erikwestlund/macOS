@@ -210,6 +210,13 @@
     state: link
     force: true
 
+- name: Link Positron settings
+  ansible.builtin.file:
+    src: "{{ system_repo }}/config/positron/settings.json"
+    dest: "{{ ansible_facts.env.HOME }}/Library/Application Support/Positron/User/settings.json"
+    state: link
+    force: true
+
 - name: Ensure yabairc is executable
   ansible.builtin.file:
     path: "{{ system_repo }}/config/yabai/yabairc"
@@ -240,7 +247,9 @@
     - focus-or-launch-spotify.sh
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-youtube.sh
     - focus-or-launch-zoom.sh
+    - open-new-tableplus.sh
     - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh
@@ -311,7 +320,9 @@
     - focus-or-launch-spotify.sh
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-youtube.sh
     - focus-or-launch-zoom.sh
+    - open-new-tableplus.sh
     - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh
@@ -355,7 +366,9 @@
     - focus-or-launch-spotify.sh
     - focus-or-launch-tailscale.sh
     - focus-or-launch-teams.sh
+    - focus-or-launch-youtube.sh
     - focus-or-launch-zoom.sh
+    - open-new-tableplus.sh
     - restore-workspace-layout.sh
     - open-new-chrome.sh
     - focus-active-space.sh

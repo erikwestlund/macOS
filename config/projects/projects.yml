@@ -233,6 +233,7 @@ projects:
     php_version: '8.2'
     node_version: '20'
     db_connection: mysql
+    tableplus_database: letsrun
     mysql_additional_databases:
     - letsrun_com
     - wordpress

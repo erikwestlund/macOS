@@ -71,7 +71,7 @@ alt + cmd - d : ~/.bin/finder-downloads-window
 shift + cmd - e : ~/.config/yabai/focus-or-launch-fastmail.sh
 
 # Focus or launch Obsidian.
-shift + cmd - n : ~/.config/yabai/focus-or-launch-obsidian.sh
+alt + cmd - o : ~/.config/yabai/focus-or-launch-obsidian.sh
 
 # Temporarily disabled to allow 1Password's native global shortcut.
 # shift + cmd - p : ~/.config/yabai/focus-or-launch-1password.sh
@@ -97,8 +97,11 @@ shift + cmd - a : ~/.config/yabai/open-new-chatgpt.sh
 # Always open a new Google Chrome window on the current workspace.
 shift + cmd - b : ~/.config/yabai/open-new-chrome.sh
 
-# Always open a new YouTube web app window on the current workspace.
-shift + cmd - y : ~/.config/yabai/open-new-youtube.sh
+# Focus or launch YouTube.
+shift + cmd - y : ~/.config/yabai/focus-or-launch-youtube.sh
+
+# Always open a new TablePlus window.
+shift + cmd - u : ~/.config/yabai/open-new-tableplus.sh
 
 # Focus or launch Microsoft Outlook.
 shift + cmd - o : ~/.config/yabai/focus-or-launch-outlook.sh
@@ -118,12 +121,10 @@ shift + alt - w : NAME=workspace_apps ~/.config/sketchybar/plugins/workspace_app
 # Open the Weather app.
 alt + cmd - w : open -a Weather
 
-# Toggle Dictation from the frontmost app's Edit menu.
-ctrl + cmd - i : ~/.bin/toggle-dictation
-
 # Focus absolute previous/next spaces with wraparound.
-alt - left : ~/.config/yabai/focus-absolute-space.sh prev
-alt - right : ~/.config/yabai/focus-absolute-space.sh next
+# Keep plain option+arrow free for normal macOS word navigation.
+ctrl + alt - left : ~/.config/yabai/focus-absolute-space.sh prev
+ctrl + alt - right : ~/.config/yabai/focus-absolute-space.sh next
 
 # Focus previous/next occupied spaces.
 alt - 0x21 : ~/.config/yabai/focus-active-space.sh prev

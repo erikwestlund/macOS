@@ -161,13 +161,15 @@ sketchybar --add item battery right \
 
 sketchybar --add item btop right \
            --set btop \
-             icon="" \
-             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
-             icon.color=$ITEM_COLOR \
-             label.drawing=off \
-             background.drawing=off \
-             padding_left=19 \
-             padding_right=12 \
+              icon="" \
+              icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+              icon.color=$ITEM_COLOR \
+              icon.padding_left=7 \
+              icon.padding_right=7 \
+              label.drawing=off \
+              background.drawing=off \
+              padding_left=19 \
+              padding_right=12 \
              popup.background.color=0xf01b2028 \
              popup.background.border_color=$GROUP_BORDER_COLOR \
              popup.background.border_width=1 \

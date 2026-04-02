@@ -114,6 +114,7 @@
   loop:
     - bettertouchtool
     - cleanshot
+    - displaybuddy
     - fastmail
     - geekbench
     - google-chrome

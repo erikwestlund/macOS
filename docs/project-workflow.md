@@ -27,9 +27,11 @@ For a project alias like `na`:
 - `dna`: `docker compose up -d`
 - `ddna`: `docker compose down`
 - `tpna`: open the project's local database in TablePlus
+- `tpurlna`: print the project's local database URL for TablePlus import
 - `pullartna`: pull project artifacts into the repo
 - `pushartna`: push project artifacts from the repo
 - `projectctl tableplus na`: open the project's local database in TablePlus
+- `projectctl tableplus-url na`: print the project's local database URL for TablePlus import
 - `na`: cd to project code directory
 - `pmna`: cd to project management directory under `~/System/projects`
 

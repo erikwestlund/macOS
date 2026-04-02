@@ -53,6 +53,7 @@ when 'aliases'
     puts "alias d#{a}='$HOME/.bin/projectctl up #{a}'"
     puts "alias dd#{a}='$HOME/.bin/projectctl down #{a}'"
     puts "alias tp#{a}='$HOME/.bin/projectctl tableplus #{a}'"
+    puts "alias tpurl#{a}='$HOME/.bin/projectctl tableplus-url #{a}'"
     puts "alias pullart#{a}='$HOME/.bin/artifacts-pull #{a}'"
     puts "alias pushart#{a}='$HOME/.bin/artifacts-push #{a}'"
     puts "function #{a}() { cd \"$($HOME/.bin/project-meta field #{a} path)\"; }"
