@@ -32,6 +32,7 @@ fi
 /opt/homebrew/bin/yabai -m rule --remove float-activity-monitor 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-system-information 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-photo-booth 2>/dev/null || true
+/opt/homebrew/bin/yabai -m rule --remove float-obsidian 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-cleanshot 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-finder 2>/dev/null || true
 /opt/homebrew/bin/yabai -m rule --remove float-ivanti 2>/dev/null || true
@@ -46,6 +47,7 @@ fi
 /opt/homebrew/bin/yabai -m rule --add label=float-activity-monitor app="^Activity Monitor$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-system-information app="^System Information$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-photo-booth app="^Photo Booth$" manage=off
+/opt/homebrew/bin/yabai -m rule --add label=float-obsidian app="^Obsidian$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-cleanshot app="^CleanShot X$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-finder app="^Finder$" manage=off
 /opt/homebrew/bin/yabai -m rule --add label=float-ivanti-access app="^Ivanti Secure Access$" manage=off
@@ -63,6 +65,7 @@ fi
 /opt/homebrew/bin/yabai -m rule --apply app="^1Password.*$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^System Information$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Photo Booth$" manage=off || true
+/opt/homebrew/bin/yabai -m rule --apply app="^Obsidian$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^CleanShot X$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true
 /opt/homebrew/bin/yabai -m rule --apply app="^Ivanti Secure Access$" manage=off || true

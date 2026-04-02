@@ -49,6 +49,7 @@
     - awscli
     - borders
     - btop
+    - claude-code
     - cmake
     - composer
     - caddy

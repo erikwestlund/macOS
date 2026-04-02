@@ -7,7 +7,7 @@ truncate_text() {
   local limit=36
 
   if [ -f "$HOME/.machine" ] && [ "$(/usr/bin/tr -d '[:space:]' < "$HOME/.machine")" = "desktop" ]; then
-    limit=72
+    limit=120
   fi
 
   if [[ ${#text} -le $limit ]]; then
@@ -40,7 +40,8 @@ show_item() {
     drawing=on \
     icon="$icon" \
     icon.color="$color" \
-    label="$(truncate_text "$label")"
+    label="$(truncate_text "$label")" \
+    --set now_playing_group background.drawing=on
 }
 
 if command -v media-control >/dev/null 2>&1; then
@@ -109,4 +110,5 @@ if [[ "$music_state" == "playing" ]]; then
   fi
 fi
 
-sketchybar --set "$NAME" drawing=off
+sketchybar --set "$NAME" drawing=off \
+  --set now_playing_group background.drawing=off

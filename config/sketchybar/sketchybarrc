@@ -8,8 +8,9 @@ if [ -f "$HOME/.machine" ]; then
   machine_scope="$(/usr/bin/tr -d '[:space:]' < "$HOME/.machine")"
 fi
 
-BAR_COLOR=0xa8141820
-GROUP_COLOR=0x801b2028
+BAR_COLOR=0x00000000
+SPACE_GROUP_COLOR=0xb01b2028
+STATUS_GROUP_COLOR=$SPACE_GROUP_COLOR
 GROUP_BORDER_COLOR=0x406f7a86
 ITEM_COLOR=0xffabc5da
 MUTED_COLOR=0xb389939e
@@ -29,7 +30,7 @@ NOW_PLAYING_MAX_CHARS=36
 
 if [ "$machine_scope" = "desktop" ]; then
   NOW_PLAYING_POSITION=center
-  NOW_PLAYING_MAX_CHARS=72
+  NOW_PLAYING_MAX_CHARS=120
   /opt/homebrew/bin/yabai -m config external_bar all:34:0 >/dev/null 2>&1 || true
 fi
 
@@ -40,7 +41,7 @@ sketchybar --bar \
   sticky=on \
   topmost=window \
   font_smoothing=on \
-  blur_radius=32 \
+  blur_radius=0 \
   margin=0 \
   corner_radius=0 \
   y_offset=0 \
@@ -93,11 +94,11 @@ sketchybar --set space.12 padding_right=10
 
 sketchybar --add bracket spaces '/space\..*/' \
            --set spaces \
-            background.color=$GROUP_COLOR \
+            background.color=$SPACE_GROUP_COLOR \
             background.border_color=$GROUP_BORDER_COLOR \
             background.border_width=1 \
-           background.corner_radius=13 \
-           background.height=28 \
+            background.corner_radius=13 \
+            background.height=28 \
             y_offset=0 \
             background.padding_left=6 \
             background.padding_right=6
@@ -120,37 +121,37 @@ sketchybar --add item workspace_apps left \
 
 sketchybar --add item clock right \
            --set clock \
-              icon.drawing=off \
-              label.color=$ITEM_COLOR \
-              background.drawing=off \
-              padding_left=25 \
-              padding_right=14 \
-              update_freq=10 \
-              script="$PLUGIN_DIR/clock.sh"
+               icon.drawing=off \
+               label.color=$ITEM_COLOR \
+               background.drawing=off \
+               padding_left=20 \
+               padding_right=12 \
+               update_freq=10 \
+               script="$PLUGIN_DIR/clock.sh"
 
 sketchybar --add item weather right \
            --set weather \
-              icon.drawing=off \
-              label="$WEATHER_LABEL" \
-              label.color=$ITEM_COLOR \
-              background.drawing=off \
-              padding_left=18 \
-              padding_right=4 \
-              update_freq=900 \
-              script="$PLUGIN_DIR/weather.sh" \
+               icon.drawing=off \
+               label="$WEATHER_LABEL" \
+               label.color=$ITEM_COLOR \
+               background.drawing=off \
+               padding_left=14 \
+               padding_right=4 \
+               update_freq=900 \
+               script="$PLUGIN_DIR/weather.sh" \
               click_script="open -a Weather; NAME=weather $PLUGIN_DIR/weather.sh" \
               --subscribe weather front_app_switched
 
 sketchybar --add item battery right \
            --set battery \
-               drawing=off \
-               icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
-              icon.padding_right=4 \
-              label.color=$ITEM_COLOR \
-             background.drawing=off \
-             padding_left=13 \
-             padding_right=12 \
-             popup.background.color=0xf01b2028 \
+                drawing=off \
+                icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+               icon.padding_right=4 \
+               label.color=$ITEM_COLOR \
+              background.drawing=off \
+              padding_left=10 \
+              padding_right=10 \
+              popup.background.color=0xf01b2028 \
              popup.background.border_color=$GROUP_BORDER_COLOR \
              popup.background.border_width=1 \
              popup.background.corner_radius=12 \
@@ -161,16 +162,16 @@ sketchybar --add item battery right \
 
 sketchybar --add item btop right \
            --set btop \
-              icon="" \
-              icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
-              icon.color=$ITEM_COLOR \
-              icon.padding_left=7 \
-              icon.padding_right=7 \
-              label.drawing=off \
-              background.drawing=off \
-              padding_left=19 \
-              padding_right=12 \
-             popup.background.color=0xf01b2028 \
+               icon="" \
+               icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+               icon.color=$ITEM_COLOR \
+               icon.padding_left=7 \
+               icon.padding_right=7 \
+               label.drawing=off \
+               background.drawing=off \
+               padding_left=14 \
+               padding_right=10 \
+              popup.background.color=0xf01b2028 \
              popup.background.border_color=$GROUP_BORDER_COLOR \
              popup.background.border_width=1 \
              popup.background.corner_radius=12 \
@@ -181,16 +182,16 @@ sketchybar --add item btop right \
 
 sketchybar --add item tmux right \
            --set tmux \
-             icon="" \
-             icon.font="JetBrainsMono Nerd Font:Regular:10.0" \
-             icon.padding_right=2 \
-             label.padding_left=0 \
-             label.padding_right=0 \
-             label.color=$ITEM_COLOR \
-             background.drawing=off \
-             padding_left=12 \
-             padding_right=12 \
-             popup.background.color=0xf01b2028 \
+              icon="" \
+              icon.font="JetBrainsMono Nerd Font:Regular:10.0" \
+              icon.padding_right=2 \
+              label.padding_left=0 \
+              label.padding_right=0 \
+              label.color=$ITEM_COLOR \
+              background.drawing=off \
+              padding_left=10 \
+              padding_right=10 \
+              popup.background.color=0xf01b2028 \
              popup.background.border_color=$GROUP_BORDER_COLOR \
              popup.background.border_width=1 \
              popup.background.corner_radius=12 \
@@ -201,24 +202,48 @@ sketchybar --add item tmux right \
 
 sketchybar --add item tailscale right \
            --set tailscale \
-             icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
-             background.drawing=off \
-             padding_left=12 \
-             padding_right=12 \
-             update_freq=15 \
-             script="$PLUGIN_DIR/tailscale.sh"
+              icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+              background.drawing=off \
+              padding_left=10 \
+              padding_right=10 \
+              update_freq=15 \
+              script="$PLUGIN_DIR/tailscale.sh"
 
 sketchybar --add item now_playing "$NOW_PLAYING_POSITION" \
            --set now_playing \
-              icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
-              icon.padding_right=4 \
-              label.max_chars=$NOW_PLAYING_MAX_CHARS \
-              label.color=$ITEM_COLOR \
-              background.drawing=off \
-              padding_left=12 \
-              padding_right=12 \
-              update_freq=5 \
-              script="$PLUGIN_DIR/now_playing.sh"
+               icon.font="JetBrainsMono Nerd Font:Regular:11.0" \
+               icon.padding_right=4 \
+               label.max_chars=$NOW_PLAYING_MAX_CHARS \
+               label.color=$ITEM_COLOR \
+               background.drawing=off \
+               padding_left=12 \
+               padding_right=12 \
+               update_freq=5 \
+               script="$PLUGIN_DIR/now_playing.sh"
+
+sketchybar --add bracket right_status clock weather battery btop tmux tailscale \
+           --set right_status \
+            background.drawing=on \
+            background.color=$STATUS_GROUP_COLOR \
+            background.border_color=$GROUP_BORDER_COLOR \
+            background.border_width=1 \
+            background.corner_radius=13 \
+            background.height=28 \
+            y_offset=0 \
+            background.padding_left=4 \
+            background.padding_right=4
+
+sketchybar --add bracket now_playing_group now_playing \
+           --set now_playing_group \
+            background.drawing=off \
+            background.color=$STATUS_GROUP_COLOR \
+            background.border_color=$GROUP_BORDER_COLOR \
+            background.border_width=1 \
+            background.corner_radius=13 \
+            background.height=28 \
+            y_offset=0 \
+            background.padding_left=6 \
+            background.padding_right=6
 
 NAME=weather "$PLUGIN_DIR/weather.sh" >/dev/null 2>&1 || true
 

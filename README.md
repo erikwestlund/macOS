@@ -51,6 +51,7 @@ mac-secrets
 - Dotfiles and system configuration live in `~/System`.
 - Secrets are bootstrapped through this repository on the first playbook run and follow the Omarchy pattern after that: `~/.secrets` is the local secrets store, `secrets-pull` syncs secrets locally, and `mac-secrets` deploys them into final locations.
 - `rclone` is installed from Homebrew and its config is linked from `~/.secrets/rclone` when present.
+- `claude-code` is installed from Homebrew as part of the base packages role.
 - `cmake` is installed from Homebrew as part of the base packages role so R packages with native build steps can compile without a manual one-off install.
 - Privileged Homebrew casks are not installed on the first run. Once the main bootstrap has created `/private/etc/sudoers.d/<user>`, later `mac-sys` runs include them automatically. Use `ansible-playbook ~/System/ansible/playbook.yml --tags packages -e install_privileged_casks=true` or `mac-apps-privileged` if you want to install them immediately after bootstrap.
 - `UniFi Identity Endpoint` is managed as a privileged Homebrew cask, so it installs automatically on later `mac-sys` runs or during that immediate `install_privileged_casks=true` follow-up run.
@@ -84,6 +85,7 @@ mac-secrets
 - Borders is installed by Ansible and uses a tracked `config/borders/bordersrc` under `~/.config/borders` for focused window borders.
 - skhd is installed by Ansible and uses a tracked `config/skhd/skhdrc` symlinked to `~/.config/skhd/skhdrc`.
 - SketchyBar is installed by Ansible and uses a tracked `config/sketchybar` under `~/.config/sketchybar`.
+- The SketchyBar bar itself is transparent; the workspace cluster, right-side status items, and active `now_playing` item render inside rounded group backgrounds instead.
 - Ansible enables the Mission Control setting `Displays have separate Spaces`, which yabai requires to start.
 - yabai is configured for BSP tiling by default, creates up to 12 spaces on the primary display, and Borders provides a thin cyan focus border while skhd binds workspace navigation to `Option+1-0,-,=` with window focus/movement on `Option+h/j/k/l` and `Option+Shift+h/j/k/l`.
 - Window resizing is bound to `Option+Shift+,` and `Option+Shift+.` for width, plus `Command+Option+Shift+,` and `Command+Option+Shift+.` for height.
