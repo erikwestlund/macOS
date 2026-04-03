@@ -9,6 +9,8 @@ alt - l : /opt/homebrew/bin/yabai -m window --focus east || /opt/homebrew/bin/ya
 # Move windows around inside the current BSP tree.
 shift + alt - h : /opt/homebrew/bin/yabai -m window --warp west
 shift + alt - j : /opt/homebrew/bin/yabai -m window --warp south
+shift + cmd - h : /opt/homebrew/bin/yabai -m window --warp west
+shift + cmd - j : /opt/homebrew/bin/yabai -m window --warp south
 
 # Focus or launch Ivanti Secure Access.
 ctrl + alt - j : ~/.config/yabai/focus-or-launch-ivanti.sh
@@ -16,6 +18,8 @@ ctrl + alt - j : ~/.config/yabai/focus-or-launch-ivanti.sh
 # Move windows around inside the current BSP tree.
 shift + alt - k : /opt/homebrew/bin/yabai -m window --warp north
 shift + alt - l : /opt/homebrew/bin/yabai -m window --warp east
+shift + cmd - k : /opt/homebrew/bin/yabai -m window --warp north
+shift + cmd - l : /opt/homebrew/bin/yabai -m window --warp east
 
 # Focus or launch Tailscale.
 ctrl + alt - v : ~/.config/yabai/focus-or-launch-tailscale.sh
@@ -89,7 +93,7 @@ alt + cmd - h : ~/.bin/ghostty-cheatsheet
 alt + cmd - k : ~/.config/yabai/open-working-memory.sh
 
 # Always open a new Claude web app window on the current workspace.
-shift + cmd - k : ~/.config/yabai/open-new-claude.sh
+shift + cmd - i : ~/.config/yabai/open-new-claude.sh
 
 # Always open a new ChatGPT web app window on the current workspace.
 shift + cmd - a : ~/.config/yabai/open-new-chatgpt.sh
@@ -129,6 +133,8 @@ ctrl + alt - right : ~/.config/yabai/focus-absolute-space.sh next
 # Focus previous/next occupied spaces.
 alt - 0x21 : ~/.config/yabai/focus-active-space.sh prev
 alt - 0x1E : ~/.config/yabai/focus-active-space.sh next
+cmd - 0x21 : ~/.config/yabai/focus-active-space.sh prev
+cmd - 0x1E : ~/.config/yabai/focus-active-space.sh next
 
 # Toggle a hidden scratch workspace on space 13.
 alt - 0x10 : ~/.config/yabai/toggle-scratch-space.sh
@@ -155,6 +161,18 @@ alt - 9 : ~/.config/yabai/focus-space.sh 9
 alt - 0 : ~/.config/yabai/focus-space.sh 10
 alt - 0x1B : ~/.config/yabai/focus-space.sh 11
 alt - 0x18 : ~/.config/yabai/focus-space.sh 12
+ctrl - 1 : ~/.config/yabai/focus-space.sh 1
+ctrl - 2 : ~/.config/yabai/focus-space.sh 2
+ctrl - 3 : ~/.config/yabai/focus-space.sh 3
+ctrl - 4 : ~/.config/yabai/focus-space.sh 4
+ctrl - 5 : ~/.config/yabai/focus-space.sh 5
+ctrl - 6 : ~/.config/yabai/focus-space.sh 6
+ctrl - 7 : ~/.config/yabai/focus-space.sh 7
+ctrl - 8 : ~/.config/yabai/focus-space.sh 8
+ctrl - 9 : ~/.config/yabai/focus-space.sh 9
+ctrl - 0 : ~/.config/yabai/focus-space.sh 10
+ctrl - 0x1B : ~/.config/yabai/focus-space.sh 11
+ctrl - 0x18 : ~/.config/yabai/focus-space.sh 12
 
 # Send the focused window to workspaces 1-12 and follow it.
 shift + alt - 1 : ~/.config/yabai/send-window-to-space-and-follow.sh 1
@@ -169,6 +187,18 @@ shift + alt - 9 : ~/.config/yabai/send-window-to-space-and-follow.sh 9
 shift + alt - 0 : ~/.config/yabai/send-window-to-space-and-follow.sh 10
 shift + alt - 0x1B : ~/.config/yabai/send-window-to-space-and-follow.sh 11
 shift + alt - 0x18 : ~/.config/yabai/send-window-to-space-and-follow.sh 12
+shift + cmd - 1 : ~/.config/yabai/send-window-to-space-and-follow.sh 1
+shift + cmd - 2 : ~/.config/yabai/send-window-to-space-and-follow.sh 2
+shift + cmd - 3 : ~/.config/yabai/send-window-to-space-and-follow.sh 3
+shift + cmd - 4 : ~/.config/yabai/send-window-to-space-and-follow.sh 4
+shift + cmd - 5 : ~/.config/yabai/send-window-to-space-and-follow.sh 5
+shift + cmd - 6 : ~/.config/yabai/send-window-to-space-and-follow.sh 6
+shift + cmd - 7 : ~/.config/yabai/send-window-to-space-and-follow.sh 7
+shift + cmd - 8 : ~/.config/yabai/send-window-to-space-and-follow.sh 8
+shift + cmd - 9 : ~/.config/yabai/send-window-to-space-and-follow.sh 9
+shift + cmd - 0 : ~/.config/yabai/send-window-to-space-and-follow.sh 10
+shift + cmd - 0x1B : ~/.config/yabai/send-window-to-space-and-follow.sh 11
+shift + cmd - 0x18 : ~/.config/yabai/send-window-to-space-and-follow.sh 12
 
 # Send the focused window to workspaces 1-12 without switching.
 ctrl + shift + alt - 1 : /opt/homebrew/bin/yabai -m window --space 1

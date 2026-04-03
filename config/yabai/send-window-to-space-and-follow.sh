@@ -8,5 +8,6 @@ window_id=$(/opt/homebrew/bin/yabai -m query --windows --window | /usr/bin/grep 
 
 /opt/homebrew/bin/yabai -m window "$window_id" --space "$target_space" || exit 1
 /opt/homebrew/bin/yabai -m space --focus "$target_space" || exit 1
+~/.config/yabai/refresh-space-bar.sh
 /bin/sleep 0.05
 /opt/homebrew/bin/yabai -m window --focus "$window_id"

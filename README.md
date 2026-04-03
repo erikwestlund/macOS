@@ -87,7 +87,7 @@ mac-secrets
 - SketchyBar is installed by Ansible and uses a tracked `config/sketchybar` under `~/.config/sketchybar`.
 - The SketchyBar bar itself is transparent; the workspace cluster, right-side status items, and active `now_playing` item render inside rounded group backgrounds instead.
 - Ansible enables the Mission Control setting `Displays have separate Spaces`, which yabai requires to start.
-- yabai is configured for BSP tiling by default, creates up to 12 spaces on the primary display, and Borders provides a thin cyan focus border while skhd binds workspace navigation to `Option+1-0,-,=` with window focus/movement on `Option+h/j/k/l` and `Option+Shift+h/j/k/l`.
+- yabai is configured for BSP tiling by default, creates up to 12 spaces on the primary display, and Borders provides a thin cyan focus border while skhd binds workspace navigation to `Option+1-0,-,=`, `Control+1-0,-,=`, `Option+[`, `Option+]`, `Command+[`, and `Command+]`, plus send-and-follow on both `Option+Shift+1-0,-,=` and `Command+Shift+1-0,-,=`, with window focus/movement on `Option+h/j/k/l` and both `Option+Shift+h/j/k/l` and `Command+Shift+h/j/k/l`.
 - Window resizing is bound to `Option+Shift+,` and `Option+Shift+.` for width, plus `Command+Option+Shift+,` and `Command+Option+Shift+.` for height.
 - Ansible manages passwordless sudo for the local user via `/private/etc/sudoers.d/<user>`; the first apply still requires an authenticated sudo run.
 - macOS still requires Accessibility permission for `skhd` and window manager permissions for `yabai` in System Settings.

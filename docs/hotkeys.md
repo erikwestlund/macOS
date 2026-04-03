@@ -11,9 +11,9 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Command+Shift+F`: open a new Finder window
 - `Command+Option+D`: open a new Finder window to `~/Downloads`
 - `Command+Shift+E`: focus or launch Fastmail
+- `Command+Shift+I`: always open a new `Claude` web app window on the current workspace
 - `Command+Shift+R`: focus or launch Slack
 - `Command+Shift+S`: focus or launch Spotify
-- `Command+Shift+K`: always open a new `Claude` web app window on the current workspace
 - `Command+Shift+A`: always open a new `ChatGPT` web app window on the current workspace
 - `Command+Shift+B`: always open a new `Google Chrome` window on the current workspace
 - `Command+Shift+N`: focus or launch `Obsidian`
@@ -35,6 +35,10 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Option+Shift+J`: warp window south
 - `Option+Shift+K`: warp window north
 - `Option+Shift+L`: warp window east
+- `Command+Shift+H`: warp window west
+- `Command+Shift+J`: warp window south
+- `Command+Shift+K`: warp window north
+- `Command+Shift+L`: warp window east
 - `Command+Option+Shift+H`: snap focused tiled window to the left half
 - `Command+Option+Shift+J`: snap focused tiled window to the bottom half
 - `Command+Option+Shift+K`: snap focused tiled window to the top half
@@ -75,14 +79,18 @@ This file is the current diary of global hotkeys managed in this repo.
 ## Workspace Focus
 
 - `Option+1..0,-,=`: focus spaces `1..12`
+- `Control+1..0,-,=`: focus spaces `1..12`
 - `Option+Left`: focus previous absolute space with wraparound
 - `Option+Right`: focus next absolute space with wraparound
 - `Option+[` : focus previous occupied space
 - `Option+]` : focus next occupied space
+- `Command+[` : focus previous occupied space
+- `Command+]` : focus next occupied space
 
 ## Workspace Send
 
 - `Option+Shift+1..0,-,=`: send focused window to spaces `1..12`, switch there, and refocus it
+- `Command+Shift+1..0,-,=`: send focused window to spaces `1..12`, switch there, and refocus it
 - `Command+Option+Shift+1..0,-,=`: send focused window to spaces `1..12` without switching
 
 ## Scratch Space
