@@ -34,16 +34,18 @@ format_metric() {
 }
 
 show_popup() {
-  local load_avg cpu_line cpu_used memsize_bytes page_size page_counts_line free_pages speculative_pages inactive_pages file_backed_pages battery_info battery_pct
-  local available_bytes used_bytes total_gib used_gib used_pct pressure_line free_pct pressure_pct disk_line disk_total disk_used disk_free disk_pct
-  local free_bytes cached_bytes free_gib cached_gib
+  local load_avg top_output cpu_line cpu_used memsize_bytes page_size page_counts_line free_pages speculative_pages inactive_pages file_backed_pages battery_info battery_pct
+  local physmem_line physmem_used_raw physmem_unused_raw pressure_line free_pct pressure_pct disk_line disk_total disk_used disk_free disk_pct swap_line swap_used
+  local cached_bytes cached_gib
 
   clear_popup
 
   load_avg=$(sysctl -n vm.loadavg | tr -d '{}')
 
-  cpu_line=$(top -l 1 -n 0 | rg 'CPU usage' || true)
+  top_output=$(top -l 1 -n 0)
+  cpu_line=$(printf '%s\n' "$top_output" | /opt/homebrew/bin/rg 'CPU usage' || true)
   cpu_used=$(printf '%s' "$cpu_line" | awk -F',' '{gsub(/.*: /, "", $1); gsub(/% user/, "", $1); gsub(/% sys/, "", $2); printf "%.1f", $1 + $2}')
+  physmem_line=$(printf '%s\n' "$top_output" | /opt/homebrew/bin/rg 'PhysMem' || true)
 
   memsize_bytes=$(sysctl -n hw.memsize)
   page_size=$(vm_stat | awk '/page size of/ {gsub(/[^0-9]/, "", $8); print $8; exit}')
@@ -53,23 +55,21 @@ show_popup() {
   inactive_pages=$(printf '%s\n' "$page_counts_line" | awk '/Pages inactive/ {gsub(/\./, "", $3); print $3; exit}')
   file_backed_pages=$(printf '%s\n' "$page_counts_line" | awk '/File-backed pages/ {gsub(/\./, "", $3); print $3; exit}')
 
-  available_bytes=$(( (inactive_pages + free_pages + speculative_pages) * page_size ))
-  used_bytes=$(( memsize_bytes - available_bytes ))
-  free_bytes=$(( (free_pages + speculative_pages) * page_size ))
+  physmem_used_raw=$(printf '%s' "$physmem_line" | awk -F'[,(]' '{gsub(/.*: /, "", $1); gsub(/ used/, "", $1); print $1; exit}')
+  physmem_unused_raw=$(printf '%s' "$physmem_line" | awk -F'[,(]' '{gsub(/^ /, "", $NF); gsub(/ unused\.?/, "", $NF); print $NF; exit}')
   cached_bytes=$(( file_backed_pages * page_size ))
 
-  total_gib=$(awk -v bytes="$memsize_bytes" 'BEGIN {printf "%.1f", bytes / 1073741824}')
-  used_gib=$(awk -v bytes="$used_bytes" 'BEGIN {printf "%.1f", bytes / 1073741824}')
-  free_gib=$(awk -v bytes="$free_bytes" 'BEGIN {printf "%.1f", bytes / 1073741824}')
   cached_gib=$(awk -v bytes="$cached_bytes" 'BEGIN {printf "%.1f", bytes / 1073741824}')
-  used_pct=$(awk -v used="$used_bytes" -v total="$memsize_bytes" 'BEGIN {printf "%d", (used / total) * 100}')
 
-  pressure_line=$(memory_pressure | rg 'System-wide memory free percentage' || true)
+  pressure_line=$(memory_pressure | /opt/homebrew/bin/rg 'System-wide memory free percentage' || true)
   free_pct=$(printf '%s' "$pressure_line" | awk -F': ' '{gsub(/%/, "", $2); print $2}')
   pressure_pct=$(( 100 - free_pct ))
 
   battery_info=$(pmset -g batt)
   battery_pct=$(printf '%s\n' "$battery_info" | grep -Eo '[0-9]+%' | head -n 1 || true)
+
+  swap_line=$(/usr/sbin/sysctl vm.swapusage 2>/dev/null || true)
+  swap_used=$(printf '%s\n' "$swap_line" | awk '{for (i = 1; i <= NF; i++) if ($i == "used") {print $(i + 2); exit}}')
 
   disk_line=$(df -k "$HOME" | awk 'NR==2 {print $2, $3, $4, $5}')
   disk_total=$(printf '%s' "$disk_line" | awk '{printf "%.1f", $1 / 1000000}')
@@ -79,9 +79,10 @@ show_popup() {
 
   add_row "system.monitor.load" "Load avg. ${load_avg}"
   add_row "system.monitor.cpu" "$(format_metric 'CPU' "${cpu_used}%")"
-  add_row "system.monitor.mem" "$(format_metric 'Memory' "${used_gib}/${total_gib} GiB (${used_pct}%)")"
+  add_row "system.monitor.mem" "$(format_metric 'Memory' "${physmem_used_raw:-n/a} used")"
   add_row "system.monitor.cached" "$(format_metric 'Cached' "${cached_gib} GiB")"
-  add_row "system.monitor.free" "$(format_metric 'Free' "${free_gib} GiB")"
+  add_row "system.monitor.free" "$(format_metric 'Free' "${physmem_unused_raw:-n/a} unused")"
+  add_row "system.monitor.swap" "$(format_metric 'Swap' "${swap_used:-n/a}")"
   add_row "system.monitor.pressure" "$(format_metric 'Pressure' "${pressure_pct}%")"
   add_row "system.monitor.disk_used" "$(format_metric 'Disk used' "${disk_used}/${disk_total} GB (${disk_pct}%)")"
   add_row "system.monitor.disk_free" "$(format_metric 'Disk free' "${disk_free} GB")"

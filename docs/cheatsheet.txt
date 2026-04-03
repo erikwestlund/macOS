@@ -1,40 +1,48 @@
-+--------------------------------------------------------------------------------------------------+
-| HOTKEYS, UTILS, AND PROJECTS                                                       Cmd+Opt+H closes |
-+--------------------------------+--------------------------------+--------------------------------+
-| WINDOWS                        | APPS                           | SPACES / SYSTEM                |
-| Opt+H/J/K/L      Focus         | Cmd+Sh+A    New ChatGPT       | Opt+1..0,-,= Focus 1..12       |
-| Opt+Sh+H/J/K/L   Move / VPN    | Cmd+Sh+K    New Claude        | Opt+Left/Right Prev/next abs   |
-| Cmd+Opt+Sh+H/J/K/L Snap half   | Cmd+Sh+B    New Chrome        | Opt+[ / ]     Prev/next active |
-| Opt+Sh+,/.       Wider/Narrower| Cmd+Sh+Y    New YouTube       | Opt+Sh+1..=   Send and follow  |
-| Cmd+Opt+Sh+,/.   Taller/Shorter| Opt+Enter   New Ghostty       | Cmd+Opt+Sh+1..= Send no follow |
-| Cmd+Opt+N        Float / tile  | Cmd+Sh+M    Floating btop     | Opt+Y / Sh+Y Scratch toggle/send|
-| Cmd+Opt+M        Focus mode    | Cmd+Sh+D    Lazydocker        | Opt+` / Sh+` Utility toggle/send|
-| Cmd+Opt+K        Working Memory|                                |                                |
-| APPS (FOCUS / LAUNCH)          | UTILS / SCRIPTS               | SYSTEM TASKS                   |
-| Cmd+Sh+E      Fastmail         | pm-new       New project      | mac-sys       Full playbook    |
-| Cmd+Sh+R      Slack            | sso          Organize shots   | mac-packages  Packages only    |
-| Cmd+Sh+S      Spotify          | secrets-pull Pull secrets     | mac-dotfiles  Dotfiles only    |
-| Cmd+Sh+N      Obsidian         | secrets-push Push secrets     | mac-prefs     Prefs only       |
-| Cmd+Sh+O      Outlook          | add-task     Task helper      | mac-secrets   Secrets only     |
-| Cmd+Sh+T      Teams            | projectctl   Project CLI      | mac-nas       NAS only         |
-| Cmd+Sh+Z      Zoom             | reload       Reload shell     | mac-syncthing Syncthing only   |
-| Cmd+Opt+Sh+M  Music            | Cmd+Sh+F    Finder            | secrets-setup Bootstrap secrets|
-|                                | Cmd+Opt+D   Downloads         | vault-view    Vault browser    |
-|                                | Cmd+Opt+H   Cheatsheet        | na-arm64      NA images        |
-|                                | Opt+Sh+M    Monitor popup     |                                |
-|                                | Opt+Sh+T    Tmux popup        |                                |
-|                                | Opt+Sh+W    Workspace popup   |                                |
-|                                | Cmd+Opt+W   Weather app       |                                |
-|                                | Ctrl+Sh+M   Messages          |                                |
-|                                | Ctrl+Opt+J  Ivanti            |                                |
-|                                | Ctrl+Opt+V  Tailscale         |                                |
-|                                |                                |                                |
-| PROJECT PATTERNS               | POSITRON                       | PROJECT ALIASES                |
-| <alias>        cd repo dir     | Cmd+A      Toggle left sidebar | aitools bs canehr career       |
-| pm<alias>      cd pm dir       | Cmd+B      Toggle right sidebar| fwa fws geulegal hl            |
-| tm<alias>      attach tmux     | Cmd+Opt+E  File explorer       | lr lrf mac mhmi na             |
-| t<alias>       open tmux term  | Cmd+Opt+X  Extensions          | obsr om park peanuts peq       |
-| s/b/l/k<alias> setup/bootstrap | Cmd+E/T    Focus edit/terminal | r50 r50code tnt wg wsm         |
-| z/v/p<alias>   editors/view    | Ctrl+[/]   Prev/next by focus  |                                |
-| d/dd<alias>    up/down services| Cmd+P      Quick open          |                                |
-+--------------------------------------------------------------------------------------------------+
++----------------------------------------------+  +--------------------------------------+  +--------------------------------------+  +--------------------------------------+
+| WINDOW MANAGEMENT / SPACES                   |  | APPS                                 |  | TOOLS / EDITORS                      |  | PROJECTS                             |
+|----------------------------------------------|  |--------------------------------------|  |--------------------------------------|  |--------------------------------------|
+| SPACES                                       |  | FOCUS / LAUNCH                       |  | TOOLS                                |  | NAVIGATION                           |
+| Ctrl+1..0,-,=         Focus 1..12            |  | Cmd+Sh+E           Fastmail          |  | Cmd+Opt+H         Cheatsheet         |  | <alias>            cd repo dir       |
+| Cmd+Sh+1..0,-,=       Send and follow        |  | Ctrl+Opt+J         JHU VPN           |  | Ctrl, Ctrl        Dictation          |  | pm<alias>          cd pm dir         |
+| Cmd+[ / ]             Prev / next active     |  | Ctrl+Sh+M          Messages          |  | pm-new            New project wizard |  | tm<alias>          attach tmux       |
+| Ctrl+Opt+Left/Right   Prev / next abs        |  | Opt+Sh+C           Morgen            |  | projectctl        Project CLI        |  | t<alias>           open tmux term    |
+| Cmd+Opt+Sh+1..0,-,=   Send no follow         |  | Cmd+Opt+Sh+M       Music             |  | add-task          Task helper        |  |                                      |
+| Opt+Y / Opt+Sh+Y      Scratch toggle/send    |  | Cmd+Opt+O          Obsidian          |  | reload            Reload shell       |  | PROJECT ACTIONS                      |
+| Opt+` / Opt+Sh+`      Utility toggle/send    |  | Cmd+Sh+O           Outlook           |  | secrets-setup     Bootstrap secrets  |  | s<alias>           setup project     |
+|                                              |  | Opt+Sh+S           Slack             |  | secrets-pull      Pull secrets       |  | b<alias>           bootstrap project |
+| FOCUS                                        |  | Cmd+Sh+S           Spotify           |  | secrets-push      Push secrets       |  | l<alias>           launch services   |
+| Ctrl+H/J/K/L           Focus window          |  | Ctrl+Opt+V         Tailscale         |  | vault-view        Vault browser      |  | k<alias>           kill services     |
+|                                              |  | Cmd+Sh+T           Teams             |  | vault-edit        Edit vault         |  | z<alias>           open in Zed       |
+| MOVE                                         |  | Cmd+Opt+W          Weather           |  |                                      |  | p<alias>           open in Positron  |
+| Cmd+Sh+H/J/K/L        Move window            |  | Cmd+Sh+Y           YouTube           |  | SYSTEM TASKS                         |  | d<alias>           compose up -d     |
+| Cmd+Opt+Sh+H/J/K/L    Snap half              |  | Cmd+Sh+Z           Zoom              |  | mac-sys           Full playbook      |  | dd<alias>          compose down      |
+|                                              |  |                                      |  | mac-packages      Packages only      |  |                                      |
+| RESIZE                                       |  | LAUNCH NEW                           |  | mac-apps-privileged Privileged apps  |  | PROJECT DATA                         |
+| Cmd+Sh+,/.            Left / right resize    |  | Cmd+Sh+M           btop              |  | mac-dotfiles      Dotfiles only      |  | tp<alias>          open TablePlus    |
+| Cmd+Opt+Sh+,/.        Taller / shorter       |  | Cmd+Sh+A           ChatGPT           |  | mac-prefs         Prefs only         |  | tpurl<alias>       print DB URL      |
+|                                              |  | Cmd+Sh+I           Claude            |  | mac-secrets       Secrets only       |  | pullart<alias>     pull artifacts    |
+| STATE                                        |  | Cmd+Sh+B           Chrome            |  | mac-nas           NAS only           |  | pushart<alias>     push artifacts    |
+| Opt+F                 Toggle top layer       |  | Cmd+Opt+D          Finder Downloads  |  | mac-syncthing     Syncthing only     |  |                                      |
+| Opt+Sh+F              Normal layer           |  | Cmd+Sh+F           Finder            |  | mac-pull          Update repo        |  | EXISTING PROJECTS                    |
+| Cmd+Opt+N             Float / tile           |  | Ctrl+Sh+D          Lazydocker        |  | mac-push          Push repo          |  | aitools            aitools           |
+| Cmd+Opt+M             Focus mode             |  | Opt+Enter          Ghostty           |  | mac-save          Commit repo        |  | bs                 better shoes      |
+| Cmd+Opt+K             Working Memory         |  | Cmd+Sh+U           TablePlus         |  |                                      |  | canehr             canehr            |
+| PANELS / LAYOUTS                             |  |                                      |  | POSITRON                             |  | cholera            cholera           |
+| Opt+Sh+M              Monitor popup          |  |                                      |  | Cmd+A/B/P         sidebar / open     |  | fl                 flint             |
+| Opt+Sh+T              Tmux popup             |  |                                      |  | Cmd+E/T           edit / terminal    |  | fw                 framework         |
+| Opt+Sh+W              Workspace popup        |  |                                      |  | Cmd+Opt+E/X       explorer / ext     |  | fws                framework site    |
+| Ctrl+Opt+0            Open default ws10      |  |                                      |  | Ctrl+[/]          prev/next focus    |  | hl                 homelab           |
+|                       Outlook / Teams        |  |                                      |  |                                      |  | licu               lift icu          |
+| Ctrl+Opt+-            Open default ws11      |  |                                      |  | ZED                                  |  | lr                 letsrun           |
+|                       FastMail / Morgen      |  |                                      |  | Cmd+E             focus center pane  |  | mac                mac system        |
+| Ctrl+Opt+Y            Open default scratch   |  |                                      |  | Cmd+T             toggle terminal    |  | na                 na accord         |
+|                       YouTube / Messages     |  |                                      |  | Cmd+Opt+A         toggle left dock   |  | park               park              |
+|                                              |  |                                      |  | Cmd+Opt+B         toggle right dock  |  | peanuts            peanuts           |
+|                                              |  |                                      |  | Ctrl+Sh+J/K       resize active dock |  | peq                pequod            |
+|                                              |  |                                      |  |                                      |  |                                      |
+|                                              |  |                                      |  | NVIM                                 |  | OTHER LABELS                         |
+|                                              |  |                                      |  | nv                open Neovim        |  | career  cdv       drtp    geulegal   |
+|                                              |  |                                      |  |                                      |  | fwa     lrf       mhmi    obsr       |
+|                                              |  |                                      |  |                                      |  | om      r50       r50code tnt        |
+|                                              |  |                                      |  |                                      |  | wg      wsm                          |
++----------------------------------------------+  +--------------------------------------+  +--------------------------------------+  +--------------------------------------+

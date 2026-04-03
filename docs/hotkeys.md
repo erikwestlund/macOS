@@ -11,8 +11,9 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Command+Shift+F`: open a new Finder window
 - `Command+Option+D`: open a new Finder window to `~/Downloads`
 - `Command+Shift+E`: focus or launch Fastmail
+- `Option+Shift+C`: focus or launch Morgen
 - `Command+Shift+I`: always open a new `Claude` web app window on the current workspace
-- `Command+Shift+R`: focus or launch Slack
+- `Option+Shift+S`: focus or launch Slack
 - `Command+Shift+S`: focus or launch Spotify
 - `Command+Shift+A`: always open a new `ChatGPT` web app window on the current workspace
 - `Command+Shift+B`: always open a new `Google Chrome` window on the current workspace
@@ -28,6 +29,10 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Option+J`: focus south, or north if already at the edge
 - `Option+K`: focus north, or south if already at the edge
 - `Option+L`: focus east, or west if already at the edge
+- `Control+H`: focus west, or east if already at the edge
+- `Control+J`: focus south, or north if already at the edge
+- `Control+K`: focus north, or south if already at the edge
+- `Control+L`: focus east, or west if already at the edge
 
 ## Window Move
 
@@ -46,13 +51,17 @@ This file is the current diary of global hotkeys managed in this repo.
 
 ## Window Resize
 
-- `Option+Shift+,`: make window wider
-- `Option+Shift+.`: make window narrower
+- `Option+Shift+,`: resize window toward the left
+- `Option+Shift+.`: resize window toward the right
+- `Command+Shift+,`: resize window toward the left
+- `Command+Shift+.`: resize window toward the right
 - `Command+Option+Shift+,`: make window taller
 - `Command+Option+Shift+.`: make window shorter
 
 ## Window State
 
+- `Option+F`: toggle focused window always-on-top
+- `Option+Shift+F`: force focused window to normal layer
 - `Command+Option+N`: toggle focused window between tiled and floating
 - `Command+Option+M`: toggle focused window into a centered floating layout sized to `1500px x 90%`
 - `Command+Option+K`: open `~/Vault/Working Memory.md` in a new floating Zed window
@@ -70,7 +79,7 @@ This file is the current diary of global hotkeys managed in this repo.
 - `Control+Option+Y`: restore scratch workspace layout: Messages left, YouTube right
 - `Option+Shift+W`: toggle the workspace apps popup
 - `Command+Option+W`: open the `Weather` app
-- `Control+Command+I`: toggle Dictation in the frontmost app when that app exposes the standard `Edit` menu item
+- `Control, Control`: native Dictation shortcut
 
 ## Project
 

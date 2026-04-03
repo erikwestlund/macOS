@@ -3,8 +3,8 @@
 set -euo pipefail
 
 rule_label="ghostty-cheatsheet-once"
-window_width_cells=106
-window_height_cells=28
+window_width_cells=149
+window_height_cells=42
 sheet_path="$HOME/System/docs/cheatsheet.txt"
 
 display_json=$(/opt/homebrew/bin/yabai -m query --displays --display)
@@ -41,8 +41,8 @@ usable_y=$(printf '%s' "$usable_frame" | jq -r '.y')
 usable_w=$(printf '%s' "$usable_frame" | jq -r '.w')
 usable_h=$(printf '%s' "$usable_frame" | jq -r '.h')
 
-estimated_window_w=1000
-estimated_window_h=620
+estimated_window_w=1425
+estimated_window_h=920
 target_x=$(( usable_x + (usable_w - estimated_window_w) / 2 ))
 target_y=$(( usable_y + (usable_h - estimated_window_h) / 2 ))
 
@@ -70,7 +70,7 @@ for _ in {1..50}; do
   )
 
   if [[ -n "$new_id" ]]; then
-    /opt/homebrew/bin/yabai -m window "$new_id" --resize "abs:1000:620" >/dev/null 2>&1 || true
+    /opt/homebrew/bin/yabai -m window "$new_id" --resize "abs:${estimated_window_w}:${estimated_window_h}" >/dev/null 2>&1 || true
     /opt/homebrew/bin/yabai -m window "$new_id" --move "abs:${target_x}:${target_y}" >/dev/null 2>&1 || true
     break
   fi
